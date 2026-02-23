@@ -243,11 +243,12 @@ function BulkUpload({ sb, user, onDone }) {
 
     setResult({
       type: errors.length && !created && !updated ? 'error' : errors.length ? 'partial' : 'ok',
-      text: `✅ ${created} nuevos, 🔄 ${updated} actualizados${errors.length ? `. ⚠️ ${errors.length} errores.` : '.'}`
+      text: `✅ ${created} nuevos, 🔄 ${updated} actualizados, ⏭️ ${preview.length - created - updated - errors.length} sin cambios${errors.length ? `. ⚠️ ${errors.length} errores.` : '.'}`
     })
     setUploading(false)
     setPreview(null)
     setText('')
+    setProgress(0)
     if (created > 0 || updated > 0) onDone()
   }
 
@@ -301,7 +302,7 @@ function BulkUpload({ sb, user, onDone }) {
         style={{ width: '100%', padding: 14, borderRadius: 10, border: '1.5px solid #e5e7eb', fontSize: 13, fontFamily: 'monospace', outline: 'none', resize: 'vertical', boxSizing: 'border-box', marginBottom: 12 }}
       />
 
-      {result && <div style={{ padding: '10px 14px', borderRadius: 10, marginBottom: 12, background: result.type === 'ok' ? '#f0fdf4' : result.type === 'error' ? '#fef2f2' : '#fffbeb', color: result.type === 'ok' ? '#166534' : result.type === 'error' ? R : '#92400e', fontSize: 13, border: `1px solid ${result.type === 'ok' ? '#bbf7d0' : result.type === 'error' ? '#fecaca' : '#fde68a'}` }}>{result.text}</div>}
+      {result && <div style={{ padding: '16px 20px', borderRadius: 12, marginBottom: 16, background: result.type === 'ok' ? '#f0fdf4' : result.type === 'error' ? '#fef2f2' : '#fffbeb', color: result.type === 'ok' ? '#166534' : result.type === 'error' ? R : '#92400e', fontSize: 15, fontWeight: 600, border: `2px solid ${result.type === 'ok' ? '#bbf7d0' : result.type === 'error' ? '#fecaca' : '#fde68a'}`, textAlign: 'center' }}>{result.text}</div>}
 
       {!preview ? (
         <button onClick={handlePreview} disabled={!text.trim()} style={{ padding: '12px 24px', borderRadius: 10, border: 'none', background: text.trim() ? D : '#e5e7eb', color: text.trim() ? '#fff' : '#94a3b8', fontSize: 14, fontWeight: 700, cursor: text.trim() ? 'pointer' : 'default' }}>👁️ Vista Previa</button>
