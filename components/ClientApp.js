@@ -1,5 +1,8 @@
 'use client'
 import { useState, useEffect, useRef, useCallback } from 'react'
+import { getSupabaseClient } from '@/lib/supabase'
+import AuthModal from './AuthModal'
+import Dashboard from './Dashboard'
 
 const Y="#fbbf24",YD="#f59e0b",YL="#fef3c7",PG="linear-gradient(135deg,#8b5cf6,#6d28d9)",PL="#8b5cf6",G="#22c55e",GL="#dcfce7",R="#ef4444",D="#0f172a",WA="#25D366"
 
@@ -32,12 +35,30 @@ function diagnose(m){const l=m.toLowerCase()
   return{t:'Cuéntame más para darte un diagnóstico:\n\n• **¿Qué equipo o área?**\n• **¿Qué síntomas tiene?**\n• **¿Desde cuándo?**',c:null,tip:null,u:null,cost:null}
 }
 
-export default function ClientApp({ repairers: initReps, categories: initCats, states: initStates, ad }) {
-  const [tab,setTab]=useState('home')
-  const [catF,setCatF]=useState('all')
-  const [stF,setStF]=useState('all')
-  const [q,setQ]=useState('')
-  const [selR,setSelR]=useState(null)
+// ============================================================
+// MAIN APP
+// ============================================================
+export default function ClientApp({repairers:initReps,categories:initCats,states:initStates,ad}){
+  const[tab,setTab]=useState('home')
+  const[catF,setCatF]=useState('all')
+  const[stF,setStF]=useState('all')
+  const[q,setQ]=useState('')
+  const[selR,setSelR]=useState(null)
+  const[showAuth,setShowAuth]=useState(false)
+  const[user,setUser]=useState(null)
+
+  const sb=getSupabaseClient()
+
+  // Check auth on mount
+  useEffect(()=>{
+    sb.auth.getSession().then(({data:{session}})=>{
+      if(session?.user)setUser(session.user)
+    })
+    const{data:{subscription}}=sb.auth.onAuthStateChange((_,session)=>{
+      setUser(session?.user||null)
+    })
+    return()=>subscription.unsubscribe()
+  },[])
 
   const cats=[{id:'all',name:'Todas',full_name:'Todas',icon:'🔍'},...(initCats||[]).map(c=>({...c,icon:c.id==='hogar'?'🏠':c.id==='electronica'?'📱':c.id==='automotriz'?'🚗':c.id==='servicios'?'🔧':c.id==='salud'?'🏥':'📋'}))]
   const states=[{id:'all',name:'Todo el País'},...(initStates||[])]
@@ -52,16 +73,21 @@ export default function ClientApp({ repairers: initReps, categories: initCats, s
   if(q){const ql=q.toLowerCase();reps=reps.filter(r=>(r.business_name||'').toLowerCase().includes(ql)||(r.description||'').toLowerCase().includes(ql)||(r.contact_name||'').toLowerCase().includes(ql)||(r.city||'').toLowerCase().includes(ql))}
   reps.sort((a,b)=>(b.is_premium?1:0)-(a.is_premium?1:0)||(Number(b.avg_rating)||0)-(Number(a.avg_rating)||0))
 
+  const handleProfile=()=>{
+    if(user)setTab('dashboard')
+    else setShowAuth(true)
+  }
+
   return(
     <div style={{minHeight:'100vh',paddingBottom:80}}>
       {/* Header */}
       <header style={{background:Y,position:'sticky',top:0,zIndex:50,boxShadow:'0 2px 8px rgba(0,0,0,0.1)',borderBottom:`3px solid ${YD}`}}>
         <div style={{maxWidth:1200,margin:'0 auto',padding:'0 16px',display:'flex',alignItems:'center',justifyContent:'space-between',height:52}}>
           <div onClick={()=>{setTab('home');setCatF('all');setQ('')}} style={{cursor:'pointer'}}><span style={{fontWeight:900,fontSize:21,color:D}}>QuienRepara</span></div>
-          <button style={{padding:'6px 16px',borderRadius:20,border:'none',background:D,color:'#fff',fontSize:12,fontWeight:700,cursor:'pointer',display:'flex',alignItems:'center',gap:5}}>
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-            Instalar
-          </button>
+          <div style={{display:'flex',gap:8,alignItems:'center'}}>
+            {user?<button onClick={()=>setTab('dashboard')} style={{width:32,height:32,borderRadius:'50%',border:'2px solid '+D,background:avc(user.email),display:'flex',alignItems:'center',justifyContent:'center',color:'#fff',fontSize:13,fontWeight:700,cursor:'pointer'}}>{ini(user.user_metadata?.full_name||user.email)}</button>
+            :<button onClick={()=>setShowAuth(true)} style={{padding:'6px 16px',borderRadius:20,border:'none',background:D,color:'#fff',fontSize:12,fontWeight:700,cursor:'pointer'}}>Iniciar Sesión</button>}
+          </div>
         </div>
       </header>
 
@@ -73,7 +99,11 @@ export default function ClientApp({ repairers: initReps, categories: initCats, s
       {tab==='home'&&<HomePage nav={nav} reps={reps} cats={cats}/>}
       {tab==='ai'&&<AIPage nav={nav} catN={catN}/>}
       {tab==='search'&&<SearchPage nav={nav} reps={reps} q={q} setQ={setQ} catF={catF} setCatF={setCatF} stF={stF} setStF={setStF} cats={cats} states={states} catN={catN} stN={stN}/>}
-      {tab==='profile'&&selR&&<ProfilePage r={selR} nav={nav} catN={catN} stN={stN}/>}
+      {tab==='profile'&&selR&&<ProfilePage r={selR} nav={nav} catN={catN} stN={stN} user={user} onLogin={()=>setShowAuth(true)}/>}
+      {tab==='dashboard'&&user&&<Dashboard user={user} onBack={()=>setTab('home')} onLogout={async()=>{await sb.auth.signOut();setUser(null);setTab('home')}}/>}
+
+      {/* Auth Modal */}
+      {showAuth&&<AuthModal onClose={()=>setShowAuth(false)} onAuth={(u)=>{setUser(u);setShowAuth(false)}}/>}
 
       {/* Bottom Nav */}
       <nav style={{position:'fixed',bottom:0,left:0,right:0,background:'#fff',borderTop:'1px solid #e5e7eb',display:'flex',justifyContent:'space-around',alignItems:'center',padding:'6px 0 max(env(safe-area-inset-bottom),8px)',zIndex:50,boxShadow:'0 -2px 10px rgba(0,0,0,0.05)'}}>
@@ -84,7 +114,7 @@ export default function ClientApp({ repairers: initReps, categories: initCats, s
           <div style={{textAlign:'center',fontSize:10,fontWeight:600,color:tab==='ai'?PL:'#9ca3af',marginTop:2}}>IA</div>
         </div>
         <BN i="📍" l="Mapa" on={false} ck={()=>setTab('search')}/>
-        <BN i="👤" l="Perfil" on={false} ck={()=>{}}/>
+        <BN i="👤" l="Perfil" on={tab==='dashboard'} ck={handleProfile}/>
       </nav>
     </div>
   )
@@ -107,7 +137,6 @@ function HomePage({nav,reps,cats}){
         <button onClick={()=>nav('search')} style={{width:'100%',padding:'14px 16px',borderRadius:12,border:'1.5px solid #e5e7eb',background:'#f8fafc',color:'#94a3b8',fontSize:15,cursor:'pointer',textAlign:'left',display:'flex',alignItems:'center',gap:10}}>🔍 Ej: Electricista, Nevera, Plomero...</button>
       </div>
     </div>
-
     <div style={{maxWidth:600,margin:'-28px auto 0',padding:'0 16px',position:'relative',zIndex:2}}>
       <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:8}}>
         {cats.filter(c=>c.id!=='all').map((c,i)=><button key={c.id} onClick={()=>nav('search',{cat:c.id})} className="fade-up" style={{background:'#fff',borderRadius:14,padding:'14px 8px',border:'1px solid #e5e7eb',cursor:'pointer',textAlign:'center',boxShadow:'0 1px 4px rgba(0,0,0,0.04)',transition:'all .15s',animationDelay:`${i*.05}s`}} onMouseOver={e=>{e.currentTarget.style.transform='translateY(-3px)';e.currentTarget.style.boxShadow='0 4px 12px rgba(0,0,0,0.08)'}} onMouseOut={e=>{e.currentTarget.style.transform='';e.currentTarget.style.boxShadow='0 1px 4px rgba(0,0,0,0.04)'}}>
@@ -115,14 +144,12 @@ function HomePage({nav,reps,cats}){
         </button>)}
       </div>
     </div>
-
     <div style={{maxWidth:600,margin:'24px auto',padding:'0 16px'}}>
       <h2 style={{fontSize:16,fontWeight:700,marginBottom:10}}>💡 Problemas comunes</h2>
       <div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
         {['Mi nevera no enfría','El aire bota agua','Se dañó mi celular','Fuga de agua','Se fue la luz','Carro no arranca'].map(q=><button key={q} onClick={()=>nav('ai')} style={{padding:'8px 14px',borderRadius:20,border:'1px solid #e5e7eb',background:'#fff',color:'#374151',fontSize:13,cursor:'pointer'}}>{q}</button>)}
       </div>
     </div>
-
     <div style={{maxWidth:600,margin:'20px auto',padding:'0 16px'}}>
       <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10}}>
         <h2 style={{fontSize:16,fontWeight:700,margin:0}}>⭐ Destacados</h2>
@@ -133,7 +160,6 @@ function HomePage({nav,reps,cats}){
       </div>)}
       {!reps.length&&<p style={{color:'#94a3b8',textAlign:'center',padding:40}}>Cargando reparadores...</p>}
     </div>
-
     <div style={{maxWidth:600,margin:'32px auto 24px',padding:'0 16px'}}>
       <div style={{background:D,borderRadius:20,padding:'36px 24px',textAlign:'center',position:'relative',overflow:'hidden'}}>
         <div style={{position:'absolute',top:-30,right:-30,width:120,height:120,borderRadius:'50%',background:'rgba(251,191,36,0.15)'}}/>
@@ -252,7 +278,7 @@ function RepCard({r,nav,catN,stN}){
 // ============================================================
 // PROFILE
 // ============================================================
-function ProfilePage({r,nav,catN,stN}){
+function ProfilePage({r,nav,catN,stN,user,onLogin}){
   return<div style={{maxWidth:600,margin:'0 auto',padding:16}}>
     <button onClick={()=>nav('search')} style={{border:'none',background:'none',color:'#94a3b8',fontSize:14,cursor:'pointer',marginBottom:12,padding:0}}>← Volver</button>
     <div className="fade-up" style={{background:'#fff',borderRadius:18,border:'1px solid #e5e7eb',overflow:'hidden'}}>
@@ -289,6 +315,7 @@ function ProfilePage({r,nav,catN,stN}){
         </div>
       </div>
     </div>
+    {/* Reviews placeholder */}
     <div className="fade-up" style={{background:'#fff',borderRadius:18,border:'1px solid #e5e7eb',padding:20,marginTop:12,animationDelay:'.15s'}}>
       <h3 style={{fontSize:16,fontWeight:700,marginBottom:14}}>💬 Opiniones ({r.total_reviews||0})</h3>
       {[{n:'Laura M.',s:5,t:'Excelente servicio, muy puntual y profesional.',d:'Hace 3 días'},{n:'Roberto C.',s:4,t:'Buen trabajo, resolvió rápido.',d:'Hace 1 semana'},{n:'Patricia S.',s:5,t:'100% recomendado. Honesto con precios.',d:'Hace 2 semanas'}].map((rv,i)=><div key={i} style={{padding:'12px 0',borderBottom:i<2?'1px solid #f1f5f9':'none'}}>
@@ -301,6 +328,11 @@ function ProfilePage({r,nav,catN,stN}){
         </div>
         <p style={{margin:0,color:'#6b7280',fontSize:13,paddingLeft:36}}>{rv.t}</p>
       </div>)}
+      {/* Leave review CTA */}
+      <div style={{marginTop:16,textAlign:'center'}}>
+        {user?<button style={{padding:'10px 20px',borderRadius:10,border:`1.5px solid ${Y}`,background:'#fff',color:D,fontSize:13,fontWeight:600,cursor:'pointer'}}>⭐ Dejar una opinión</button>
+        :<button onClick={onLogin} style={{padding:'10px 20px',borderRadius:10,border:'1.5px solid #e5e7eb',background:'#fff',color:'#94a3b8',fontSize:13,fontWeight:600,cursor:'pointer'}}>Inicia sesión para opinar</button>}
+      </div>
     </div>
   </div>
 }
