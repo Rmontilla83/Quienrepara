@@ -71,9 +71,12 @@ export async function POST(request) {
       }
     }
 
-    const res = await fetch(`${GEMINI_URL}?key=${GEMINI_KEY}`, {
+    const res = await fetch(`${GEMINI_URL}`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        'x-goog-api-key': GEMINI_KEY,
+      },
       body: JSON.stringify(body),
     })
 
@@ -84,13 +87,27 @@ export async function POST(request) {
     }
 
     const data = await res.json()
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || ''
+    
+    // Gemini 2.5 may have multiple parts (thinking + response)
+    // Find the text part that contains our JSON
+    const parts = data.candidates?.[0]?.content?.parts || []
+    let text = ''
+    for (const part of parts) {
+      if (part.text && !part.thought) {
+        text = part.text
+      }
+    }
+    // Fallback: just get any text
+    if (!text) text = parts.find(p => p.text)?.text || ''
 
     // Parse JSON response from Gemini
     let parsed
     try {
-      // Clean up potential markdown wrapping
-      const clean = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim()
+      // Clean up potential markdown wrapping and find JSON
+      let clean = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim()
+      // Try to extract JSON object from the text
+      const jsonMatch = clean.match(/\{[\s\S]*\}/)
+      if (jsonMatch) clean = jsonMatch[0]
       parsed = JSON.parse(clean)
     } catch {
       // If Gemini didn't return valid JSON, create a fallback
