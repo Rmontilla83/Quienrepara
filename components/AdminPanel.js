@@ -341,7 +341,6 @@ function BulkUpload({ sb, user, onDone }) {
           {uploading && <div style={{ marginTop: 8, background: '#e5e7eb', borderRadius: 8, height: 8, overflow: 'hidden' }}>
             <div style={{ height: '100%', background: G, borderRadius: 8, width: `${progress}%`, transition: 'width 0.3s' }} />
           </div>}
-          </div>
         </div>
       )}
     </div>
