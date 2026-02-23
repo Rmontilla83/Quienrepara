@@ -149,12 +149,14 @@ function BulkUpload({ sb, user, onDone }) {
   }
 
   function mapToRepairer(row) {
+    const stateMap = {'Anzoátegui':'an','Distrito Capital':'dc','Miranda':'mi','Zulia':'zu','Carabobo':'ca','Lara':'la','Aragua':'ar','Bolívar':'bo','Monagas':'mo','Sucre':'su'}
     return {
       business_name: row.nombre_empresa || row.business_name || row.nombre || '',
       contact_name: row.nombre_contacto || row.contact_name || row.contacto || '',
       category_id: row.categoria || row.category_id || 'hogar',
+      subcategory_id: row.subcategoria || row.subcategory_id || null,
       description: row.descripcion || row.description || '',
-      state_id: row.estado === 'Anzoátegui' ? 'an' : row.estado === 'Distrito Capital' ? 'dc' : row.estado === 'Miranda' ? 'mi' : row.state_id || 'an',
+      state_id: stateMap[row.estado] || row.state_id || 'an',
       city: row.ciudad || row.city || '',
       phone: row.telefono || row.phone || '',
       email: row.email || null,
