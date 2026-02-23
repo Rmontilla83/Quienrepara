@@ -7,7 +7,7 @@ const Y="#fbbf24",YD="#f59e0b",YL="#fef3c7",PG="linear-gradient(135deg,#8b5cf6,#
 const CATS=[{id:'hogar',n:'Hogar 🏠'},{id:'electronica',n:'Electrónica 📱'},{id:'automotriz',n:'Automotriz 🚗'},{id:'servicios',n:'Servicios 🔧'},{id:'salud',n:'Eq. Médicos 🏥'}]
 const STATES=[{id:'an',n:'Anzoátegui'},{id:'dc',n:'Distrito Capital'},{id:'mi',n:'Miranda'},{id:'zu',n:'Zulia'},{id:'ca',n:'Carabobo'},{id:'la',n:'Lara'},{id:'ar',n:'Aragua'},{id:'bo',n:'Bolívar'},{id:'ne',n:'Nueva Esparta'},{id:'ta',n:'Táchira'}]
 
-export default function Dashboard({ user, onBack, onLogout }) {
+export default function Dashboard({ user, role, onBack, onLogout, onAdmin }) {
   const [rep, setRep] = useState(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -76,6 +76,7 @@ export default function Dashboard({ user, onBack, onLogout }) {
             </span>
           </div>
         </div>
+        {role==='admin'&&<button onClick={onAdmin} style={{ padding: '10px 20px', borderRadius: 10, border: '2px solid #dc2626', background: '#fff', color: '#dc2626', fontSize: 13, fontWeight: 600, cursor: 'pointer', width: '100%', marginBottom: 10, display:'flex', alignItems:'center', justifyContent:'center', gap:6 }}>🛡️ Panel de Administración</button>}
         <button onClick={onLogout} style={{ padding: '10px 20px', borderRadius: 10, border: '1px solid #fecaca', background: '#fff', color: R, fontSize: 13, fontWeight: 600, cursor: 'pointer', width: '100%' }}>Cerrar Sesión</button>
       </div>
 

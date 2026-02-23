@@ -3,6 +3,7 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { getSupabaseClient } from '@/lib/supabase'
 import AuthModal from './AuthModal'
 import Dashboard from './Dashboard'
+import AdminPanel from './AdminPanel'
 
 const Y="#fbbf24",YD="#f59e0b",YL="#fef3c7",PG="linear-gradient(135deg,#8b5cf6,#6d28d9)",PL="#8b5cf6",G="#22c55e",GL="#dcfce7",R="#ef4444",D="#0f172a",WA="#25D366"
 
@@ -46,16 +47,24 @@ export default function ClientApp({repairers:initReps,categories:initCats,states
   const[selR,setSelR]=useState(null)
   const[showAuth,setShowAuth]=useState(false)
   const[user,setUser]=useState(null)
+  const[userRole,setUserRole]=useState(null)
 
   const sb=getSupabaseClient()
+
+  async function loadRole(uid){
+    const{data}=await sb.from('profiles').select('role').eq('id',uid).single()
+    if(data)setUserRole(data.role)
+  }
 
   // Check auth on mount
   useEffect(()=>{
     sb.auth.getSession().then(({data:{session}})=>{
-      if(session?.user)setUser(session.user)
+      if(session?.user){setUser(session.user);loadRole(session.user.id)}
     })
     const{data:{subscription}}=sb.auth.onAuthStateChange((_,session)=>{
       setUser(session?.user||null)
+      if(session?.user)loadRole(session.user.id)
+      else setUserRole(null)
     })
     return()=>subscription.unsubscribe()
   },[])
@@ -85,7 +94,10 @@ export default function ClientApp({repairers:initReps,categories:initCats,states
         <div style={{maxWidth:1200,margin:'0 auto',padding:'0 16px',display:'flex',alignItems:'center',justifyContent:'space-between',height:52}}>
           <div onClick={()=>{setTab('home');setCatF('all');setQ('')}} style={{cursor:'pointer'}}><span style={{fontWeight:900,fontSize:21,color:D}}>QuienRepara</span></div>
           <div style={{display:'flex',gap:8,alignItems:'center'}}>
-            {user?<button onClick={()=>setTab('dashboard')} style={{width:32,height:32,borderRadius:'50%',border:'2px solid '+D,background:avc(user.email),display:'flex',alignItems:'center',justifyContent:'center',color:'#fff',fontSize:13,fontWeight:700,cursor:'pointer'}}>{ini(user.user_metadata?.full_name||user.email)}</button>
+            {user?<div style={{display:'flex',alignItems:'center',gap:6}}>
+              {userRole==='admin'&&<span style={{fontSize:10,padding:'2px 6px',borderRadius:4,background:'#fef2f2',color:'#dc2626',fontWeight:700}}>ADMIN</span>}
+              <button onClick={()=>setTab('dashboard')} style={{width:32,height:32,borderRadius:'50%',border:'2px solid '+D,background:avc(user.email),display:'flex',alignItems:'center',justifyContent:'center',color:'#fff',fontSize:13,fontWeight:700,cursor:'pointer'}}>{ini(user.user_metadata?.full_name||user.email)}</button>
+            </div>
             :<button onClick={()=>setShowAuth(true)} style={{padding:'6px 16px',borderRadius:20,border:'none',background:D,color:'#fff',fontSize:12,fontWeight:700,cursor:'pointer'}}>Iniciar Sesión</button>}
           </div>
         </div>
@@ -100,7 +112,8 @@ export default function ClientApp({repairers:initReps,categories:initCats,states
       {tab==='ai'&&<AIPage nav={nav} catN={catN}/>}
       {tab==='search'&&<SearchPage nav={nav} reps={reps} q={q} setQ={setQ} catF={catF} setCatF={setCatF} stF={stF} setStF={setStF} cats={cats} states={states} catN={catN} stN={stN}/>}
       {tab==='profile'&&selR&&<ProfilePage r={selR} nav={nav} catN={catN} stN={stN} user={user} onLogin={()=>setShowAuth(true)}/>}
-      {tab==='dashboard'&&user&&<Dashboard user={user} onBack={()=>setTab('home')} onLogout={async()=>{await sb.auth.signOut();setUser(null);setTab('home')}}/>}
+      {tab==='dashboard'&&user&&<Dashboard user={user} role={userRole} onBack={()=>setTab('home')} onLogout={async()=>{await sb.auth.signOut();setUser(null);setUserRole(null);setTab('home')}} onAdmin={()=>setTab('admin')}/>}
+      {tab==='admin'&&user&&userRole==='admin'&&<AdminPanel user={user} onBack={()=>setTab('dashboard')}/>}
 
       {/* Auth Modal */}
       {showAuth&&<AuthModal onClose={()=>setShowAuth(false)} onAuth={(u)=>{setUser(u);setShowAuth(false)}}/>}
