@@ -115,6 +115,7 @@ function BulkUpload({ sb, user, onDone }) {
   const [text, setText] = useState('')
   const [preview, setPreview] = useState(null)
   const [uploading, setUploading] = useState(false)
+  const [progress, setProgress] = useState(0)
   const [result, setResult] = useState(null)
   const fileRef = useRef(null)
 
@@ -150,11 +151,19 @@ function BulkUpload({ sb, user, onDone }) {
 
   function mapToRepairer(row) {
     const stateMap = {'Anzoátegui':'an','Distrito Capital':'dc','Miranda':'mi','Zulia':'zu','Carabobo':'ca','Lara':'la','Aragua':'ar','Bolívar':'bo','Monagas':'mo','Sucre':'su'}
+    // Map category names/variants to valid category IDs
+    const catMap = {'hogar':'hogar','electronica':'electronica','electrónica':'electronica','automotriz':'automotriz','servicios':'servicios','servicios_tecnicos':'servicios','salud':'salud'}
+    const rawCat = row.categoria || row.category_id || 'hogar'
+    const categoryId = catMap[rawCat] || rawCat
+    
+    // If subcategoria equals a category name, use it as subcategory_id
+    const rawSub = row.subcategoria || row.subcategory_id || null
+    
     return {
       business_name: row.nombre_empresa || row.business_name || row.nombre || '',
       contact_name: row.nombre_contacto || row.contact_name || row.contacto || '',
-      category_id: row.categoria || row.category_id || 'hogar',
-      subcategory_id: row.subcategoria || row.subcategory_id || null,
+      category_id: categoryId,
+      subcategory_id: rawSub,
       description: row.descripcion || row.description || '',
       state_id: stateMap[row.estado] || row.state_id || 'an',
       city: row.ciudad || row.city || '',
@@ -183,10 +192,11 @@ function BulkUpload({ sb, user, onDone }) {
 
   async function handleUpload() {
     if (!preview?.length) return
-    setUploading(true); setResult(null)
+    setUploading(true); setResult(null); setProgress(0)
     let created = 0, updated = 0, errors = [], errDetails = []
 
     for (let i = 0; i < preview.length; i++) {
+      setProgress(Math.round(((i + 1) / preview.length) * 100))
       const row = preview[i]
       // Check if repairer already exists by business_name + city
       const { data: existing } = await sb.from('repairers')
@@ -324,9 +334,13 @@ function BulkUpload({ sb, user, onDone }) {
           </div>
           <div style={{ display: 'flex', gap: 8 }}>
             <button onClick={() => { setPreview(null); setResult(null) }} style={{ padding: '12px 24px', borderRadius: 10, border: '1px solid #e5e7eb', background: '#fff', color: '#6b7280', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>Cancelar</button>
-            <button onClick={handleUpload} disabled={uploading} style={{ flex: 1, padding: '12px 24px', borderRadius: 10, border: 'none', background: uploading ? '#e5e7eb' : G, color: '#fff', fontSize: 14, fontWeight: 700, cursor: uploading ? 'default' : 'pointer' }}>
-              {uploading ? 'Importando...' : `✅ Importar ${preview.length} reparadores`}
+            <button onClick={handleUpload} disabled={uploading} style={{ flex: 1, padding: '12px 24px', borderRadius: 10, border: 'none', background: uploading ? '#e5e7eb' : G, color: uploading ? '#6b7280' : '#fff', fontSize: 14, fontWeight: 700, cursor: uploading ? 'default' : 'pointer' }}>
+              {uploading ? `Importando... ${progress}%` : `✅ Importar ${preview.length} reparadores`}
             </button>
+          </div>
+          {uploading && <div style={{ marginTop: 8, background: '#e5e7eb', borderRadius: 8, height: 8, overflow: 'hidden' }}>
+            <div style={{ height: '100%', background: G, borderRadius: 8, width: `${progress}%`, transition: 'width 0.3s' }} />
+          </div>}
           </div>
         </div>
       )}
