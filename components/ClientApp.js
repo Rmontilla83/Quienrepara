@@ -202,10 +202,26 @@ function MiniCard({r,ck}){
 function AIPage({nav,catN}){
   const[msgs,setMsgs]=useState([{rl:'ai',tx:'¡Hola! 👋 Soy tu asistente de **QuiénRepara**.\n\nCuéntame: **¿qué se dañó?** Te digo qué puede ser y te conecto con el mejor técnico.'}])
   const[inp,setInp]=useState('');const[typ,setTyp]=useState(false);const ref=useRef(null);const iRef=useRef(null)
+  const histRef=useRef([])
   useEffect(()=>{ref.current?.scrollIntoView({behavior:'smooth'})},[msgs])
   useEffect(()=>{iRef.current?.focus()},[])
-  const send=()=>{if(!inp.trim()||typ)return;const t=inp.trim();setInp('');setMsgs(p=>[...p,{rl:'user',tx:t}]);setTyp(true)
-    setTimeout(()=>{const r=diagnose(t);setMsgs(p=>[...p,{rl:'ai',tx:r.t,tip:r.tip,c:r.c,u:r.u,cost:r.cost}]);setTyp(false)},800+Math.random()*600)}
+
+  const send=async()=>{if(!inp.trim()||typ)return;const t=inp.trim();setInp('');setMsgs(p=>[...p,{rl:'user',tx:t}]);setTyp(true)
+    histRef.current.push({role:'user',text:t})
+    try{
+      const res=await fetch('/api/diagnose',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:t,history:histRef.current.slice(-6)})})
+      const data=await res.json()
+      if(data.error){setMsgs(p=>[...p,{rl:'ai',tx:'Lo siento, hubo un error. Intenta de nuevo.'}]);setTyp(false);return}
+      const aiText=data.diagnostico||(data.preguntas||'Cuéntame más sobre el problema.')
+      histRef.current.push({role:'ai',text:aiText})
+      setMsgs(p=>[...p,{rl:'ai',tx:aiText,tip:data.consejo,c:data.categoria,u:data.urgencia,cost:data.costo_estimado}])
+    }catch(e){
+      // Fallback to local diagnosis
+      const r=diagnose(t)
+      setMsgs(p=>[...p,{rl:'ai',tx:r.t,tip:r.tip,c:r.c,u:r.u,cost:r.cost}])
+    }
+    setTyp(false)
+  }
   const md=t=>t.split('\n').map((l,i)=>{let h=l.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\*(.+?)\*/g,'<em>$1</em>').replace(/^• /,'&bull; ');return<p key={i} style={{margin:'3px 0',lineHeight:1.65}} dangerouslySetInnerHTML={{__html:h||'&nbsp;'}}/>})
 
   return<div style={{maxWidth:600,margin:'0 auto',display:'flex',flexDirection:'column',height:'calc(100dvh - 170px)'}}>
