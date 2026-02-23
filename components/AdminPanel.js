@@ -184,12 +184,41 @@ function BulkUpload({ sb, user, onDone }) {
   async function handleUpload() {
     if (!preview?.length) return
     setUploading(true); setResult(null)
-    let success = 0, errors = [], errDetails = []
+    let created = 0, updated = 0, errors = [], errDetails = []
 
     for (let i = 0; i < preview.length; i++) {
-      const { error } = await sb.from('repairers').insert(preview[i])
-      if (error) { errors.push(i); errDetails.push({ row: i, msg: error.message }) }
-      else success++
+      const row = preview[i]
+      // Check if repairer already exists by business_name + city
+      const { data: existing } = await sb.from('repairers')
+        .select('id, business_name, contact_name, phone, email, whatsapp, instagram, hours, description, subcategory_id')
+        .eq('business_name', row.business_name)
+        .eq('city', row.city)
+        .limit(1)
+        .single()
+
+      if (existing) {
+        // Update only empty/null fields
+        const updates = {}
+        if (!existing.contact_name && row.contact_name) updates.contact_name = row.contact_name
+        if (!existing.phone && row.phone) updates.phone = row.phone
+        if (!existing.email && row.email) updates.email = row.email
+        if (!existing.whatsapp && row.whatsapp) updates.whatsapp = row.whatsapp
+        if (!existing.instagram && row.instagram) updates.instagram = row.instagram
+        if (!existing.hours && row.hours) updates.hours = row.hours
+        if (!existing.description && row.description) updates.description = row.description
+        if (!existing.subcategory_id && row.subcategory_id) updates.subcategory_id = row.subcategory_id
+
+        if (Object.keys(updates).length > 0) {
+          const { error } = await sb.from('repairers').update(updates).eq('id', existing.id)
+          if (error) { errors.push(i); errDetails.push({ row: i, msg: error.message }) }
+          else updated++
+        }
+      } else {
+        // Insert new
+        const { error } = await sb.from('repairers').insert(row)
+        if (error) { errors.push(i); errDetails.push({ row: i, msg: error.message }) }
+        else created++
+      }
     }
 
     // Log import
@@ -197,19 +226,19 @@ function BulkUpload({ sb, user, onDone }) {
       admin_id: user.id,
       filename: 'manual_paste',
       total_rows: preview.length,
-      success_count: success,
+      success_count: created + updated,
       error_count: errors.length,
       errors: errDetails.length ? errDetails : null,
-    })
+    }).catch(() => {})
 
     setResult({
-      type: errors.length ? 'partial' : 'ok',
-      text: `✅ ${success} reparadores importados${errors.length ? `. ⚠️ ${errors.length} errores.` : ' exitosamente.'}`
+      type: errors.length && !created && !updated ? 'error' : errors.length ? 'partial' : 'ok',
+      text: `✅ ${created} nuevos, 🔄 ${updated} actualizados${errors.length ? `. ⚠️ ${errors.length} errores.` : '.'}`
     })
     setUploading(false)
     setPreview(null)
     setText('')
-    if (success > 0) onDone()
+    if (created > 0 || updated > 0) onDone()
   }
 
   function handleFile(e) {
