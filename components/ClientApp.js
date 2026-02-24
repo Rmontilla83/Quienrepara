@@ -111,6 +111,7 @@ export default function ClientApp({repairers:initReps,categories:initCats,states
       {tab==='home'&&<HomePage nav={nav} reps={reps} cats={cats}/>}
       {tab==='ai'&&<AIPage nav={nav} catN={catN}/>}
       {tab==='search'&&<SearchPage nav={nav} reps={reps} q={q} setQ={setQ} catF={catF} setCatF={setCatF} stF={stF} setStF={setStF} cats={cats} states={states} catN={catN} stN={stN}/>}
+      {tab==='map'&&<MapPage reps={reps} cats={cats} nav={nav} catN={catN} stN={stN}/>}
       {tab==='profile'&&selR&&<ProfilePage r={selR} nav={nav} catN={catN} stN={stN} user={user} onLogin={()=>setShowAuth(true)}/>}
       {tab==='dashboard'&&user&&<Dashboard user={user} role={userRole} onBack={()=>setTab('home')} onLogout={async()=>{await sb.auth.signOut();setUser(null);setUserRole(null);setTab('home')}} onAdmin={()=>setTab('admin')}/>}
       {tab==='admin'&&user&&userRole==='admin'&&<AdminPanel user={user} onBack={()=>setTab('dashboard')}/>}
@@ -126,7 +127,7 @@ export default function ClientApp({repairers:initReps,categories:initCats,states
           <button onClick={()=>setTab('ai')} style={{width:56,height:56,borderRadius:'50%',border:'4px solid #f8fafc',background:PG,color:'#fff',fontSize:24,display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer',boxShadow:'0 4px 15px rgba(139,92,246,0.4)'}}>✨</button>
           <div style={{textAlign:'center',fontSize:10,fontWeight:600,color:tab==='ai'?PL:'#9ca3af',marginTop:2}}>IA</div>
         </div>
-        <BN i="📍" l="Mapa" on={false} ck={()=>setTab('search')}/>
+        <BN i="📍" l="Mapa" on={tab==='map'} ck={()=>setTab('map')}/>
         <BN i="👤" l="Perfil" on={tab==='dashboard'} ck={handleProfile}/>
       </nav>
     </div>
@@ -254,6 +255,196 @@ function AIPage({nav,catN}){
       <button onClick={send} disabled={!inp.trim()} style={{width:44,height:44,borderRadius:'50%',border:'none',background:inp.trim()?PG:'#e5e7eb',color:inp.trim()?'#fff':'#9ca3af',fontSize:18,cursor:inp.trim()?'pointer':'default',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>↑</button>
     </div>
   </div>
+}
+
+// ============================================================
+// MAP
+// ============================================================
+const CITY_COORDS = {
+  'Barcelona': { lat: 10.1364, lng: -64.6867 },
+  'Puerto La Cruz': { lat: 10.2176, lng: -64.6322 },
+  'Lechería': { lat: 10.1925, lng: -64.6943 },
+  'El Tigre': { lat: 8.8855, lng: -64.2539 },
+  'Anaco': { lat: 9.4309, lng: -64.4661 },
+  'Guanta': { lat: 10.2333, lng: -64.5833 },
+  'Puerto Píritu': { lat: 10.0603, lng: -65.0372 },
+  'Clarines': { lat: 9.9333, lng: -65.1667 },
+  'Caracas': { lat: 10.4806, lng: -66.9036 },
+  'Valencia': { lat: 10.1620, lng: -67.9946 },
+  'Maracaibo': { lat: 10.6544, lng: -71.6297 },
+  'Barquisimeto': { lat: 10.0647, lng: -69.3570 },
+  'Maracay': { lat: 10.2442, lng: -67.5978 },
+  'Ciudad Bolívar': { lat: 8.1165, lng: -63.5360 },
+  'Porlamar': { lat: 11.0020, lng: -63.8500 },
+  'San Cristóbal': { lat: 7.7667, lng: -72.2250 },
+  'Maturín': { lat: 9.7500, lng: -63.1833 },
+  'Cumaná': { lat: 10.4500, lng: -64.1667 },
+}
+const CAT_COLORS = { hogar: '#3b82f6', electronica: '#8b5cf6', automotriz: '#ef4444', servicios: '#f59e0b', salud: '#22c55e' }
+const CAT_ICONS = { hogar: '🏠', electronica: '📱', automotriz: '🚗', servicios: '🔧', salud: '🏥' }
+
+function MapPage({ reps, cats, nav, catN, stN }) {
+  const mapRef = useRef(null)
+  const mapInstance = useRef(null)
+  const markersRef = useRef([])
+  const infoRef = useRef(null)
+  const [catF, setCatF] = useState('all')
+  const [selRep, setSelRep] = useState(null)
+  const [mapReady, setMapReady] = useState(false)
+  const [search, setSearch] = useState('')
+
+  // Load Google Maps script
+  useEffect(() => {
+    if (window.google?.maps) { setMapReady(true); return }
+    const key = process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY
+    if (!key) return
+    const script = document.createElement('script')
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${key}&libraries=places`
+    script.async = true
+    script.defer = true
+    script.onload = () => setMapReady(true)
+    document.head.appendChild(script)
+  }, [])
+
+  // Init map
+  useEffect(() => {
+    if (!mapReady || !mapRef.current || mapInstance.current) return
+    mapInstance.current = new google.maps.Map(mapRef.current, {
+      center: { lat: 10.18, lng: -64.68 },
+      zoom: 12,
+      styles: [
+        { featureType: 'poi', stylers: [{ visibility: 'off' }] },
+        { featureType: 'transit', stylers: [{ visibility: 'off' }] },
+        { elementType: 'labels.icon', stylers: [{ visibility: 'off' }] },
+      ],
+      mapTypeControl: false,
+      streetViewControl: false,
+      fullscreenControl: false,
+    })
+    infoRef.current = new google.maps.InfoWindow()
+  }, [mapReady])
+
+  // seed-based pseudo-random
+  function seededRand(seed) {
+    let x = Math.sin(seed) * 10000
+    return x - Math.floor(x)
+  }
+
+  function getCoords(rep, idx) {
+    const base = CITY_COORDS[rep.city] || CITY_COORDS['Barcelona']
+    const offsetLat = (seededRand(idx * 13 + 7) - 0.5) * 0.025
+    const offsetLng = (seededRand(idx * 17 + 3) - 0.5) * 0.025
+    return { lat: base.lat + offsetLat, lng: base.lng + offsetLng }
+  }
+
+  // Update markers when filter changes
+  useEffect(() => {
+    if (!mapInstance.current || !mapReady) return
+    // Clear existing markers
+    markersRef.current.forEach(m => m.setMap(null))
+    markersRef.current = []
+
+    const filtered = reps.filter(r => {
+      if (catF !== 'all' && r.category_id !== catF) return false
+      if (search) {
+        const q = search.toLowerCase()
+        return r.business_name?.toLowerCase().includes(q) || r.city?.toLowerCase().includes(q) || r.contact_name?.toLowerCase().includes(q)
+      }
+      return true
+    })
+
+    filtered.forEach((r, i) => {
+      const pos = getCoords(r, i)
+      const color = CAT_COLORS[r.category_id] || '#6b7280'
+      const icon = CAT_ICONS[r.category_id] || '📍'
+      
+      const marker = new google.maps.Marker({
+        position: pos,
+        map: mapInstance.current,
+        title: r.business_name,
+        icon: {
+          path: google.maps.SymbolPath.CIRCLE,
+          fillColor: color,
+          fillOpacity: 0.9,
+          strokeColor: '#fff',
+          strokeWeight: 2,
+          scale: 10,
+        },
+        label: { text: icon, fontSize: '14px' },
+      })
+
+      marker.addListener('click', () => {
+        setSelRep(r)
+        infoRef.current.setContent(`<div style="font-family:system-ui;padding:4px"><strong>${r.business_name}</strong><br><span style="color:#6b7280;font-size:12px">${r.city} · ${catN(r.category_id)}</span></div>`)
+        infoRef.current.open(mapInstance.current, marker)
+        mapInstance.current.panTo(pos)
+      })
+
+      markersRef.current.push(marker)
+    })
+
+    // Fit bounds if markers exist
+    if (markersRef.current.length > 0 && markersRef.current.length < 100) {
+      const bounds = new google.maps.LatLngBounds()
+      markersRef.current.forEach(m => bounds.extend(m.getPosition()))
+      mapInstance.current.fitBounds(bounds, 60)
+    }
+  }, [reps, catF, search, mapReady])
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', height: 'calc(100dvh - 130px)' }}>
+      {/* Search + filters */}
+      <div style={{ padding: '10px 16px 0', background: '#fff', zIndex: 10 }}>
+        <div style={{ position: 'relative', marginBottom: 8 }}>
+          <span style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', fontSize: 16 }}>🔍</span>
+          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Buscar por nombre o ciudad..." style={{ width: '100%', padding: '10px 10px 10px 38px', borderRadius: 10, border: '1.5px solid #e5e7eb', fontSize: 14, outline: 'none', boxSizing: 'border-box' }} />
+        </div>
+        <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 8, scrollbarWidth: 'none' }}>
+          {cats.map(c => (
+            <button key={c.id} onClick={() => setCatF(c.id === catF ? 'all' : c.id)} style={{ padding: '6px 12px', borderRadius: 20, border: catF === c.id ? 'none' : '1px solid #e5e7eb', background: catF === c.id ? CAT_COLORS[c.id] || D : '#fff', color: catF === c.id ? '#fff' : '#6b7280', fontSize: 12, fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0 }}>
+              {c.icon} {c.name}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Map */}
+      <div ref={mapRef} style={{ flex: 1, minHeight: 300 }}>
+        {!mapReady && <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#94a3b8' }}>Cargando mapa...</div>}
+      </div>
+
+      {/* Selected repairer card */}
+      {selRep && (
+        <div style={{ position: 'absolute', bottom: 80, left: 16, right: 16, background: '#fff', borderRadius: 16, padding: 16, boxShadow: '0 8px 30px rgba(0,0,0,0.15)', zIndex: 20, maxWidth: 500, margin: '0 auto' }}>
+          <button onClick={() => setSelRep(null)} style={{ position: 'absolute', top: 8, right: 12, border: 'none', background: 'none', fontSize: 18, cursor: 'pointer', color: '#94a3b8' }}>✕</button>
+          <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+            <div style={{ width: 50, height: 50, borderRadius: 14, background: CAT_COLORS[selRep.category_id] || '#6b7280', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, flexShrink: 0 }}>
+              {CAT_ICONS[selRep.category_id] || '📍'}
+            </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{selRep.business_name}</h3>
+                {selRep.is_verified && <span style={{ fontSize: 14 }}>✓</span>}
+                {selRep.is_premium && <span style={{ fontSize: 14 }}>⭐</span>}
+              </div>
+              <p style={{ margin: '2px 0 0', fontSize: 13, color: '#6b7280' }}>📍 {selRep.city} · {catN(selRep.category_id)}</p>
+              {selRep.avg_rating && <p style={{ margin: '2px 0 0', fontSize: 13, color: '#f59e0b', fontWeight: 700 }}>⭐ {Number(selRep.avg_rating).toFixed(1)} ({selRep.review_count})</p>}
+            </div>
+          </div>
+          <p style={{ margin: '8px 0', fontSize: 13, color: '#6b7280', lineHeight: 1.5 }}>{selRep.description?.slice(0, 100)}{selRep.description?.length > 100 ? '...' : ''}</p>
+          <div style={{ display: 'flex', gap: 8 }}>
+            {selRep.phone && selRep.phone !== 'verificar' && (
+              <a href={`tel:${selRep.phone}`} style={{ flex: 1, padding: '10px', borderRadius: 10, background: '#22c55e', color: '#fff', textAlign: 'center', textDecoration: 'none', fontSize: 13, fontWeight: 700 }}>📞 Llamar</a>
+            )}
+            {selRep.whatsapp && (
+              <a href={`https://wa.me/${selRep.whatsapp.replace(/[^0-9]/g, '')}`} target="_blank" style={{ flex: 1, padding: '10px', borderRadius: 10, background: '#25d366', color: '#fff', textAlign: 'center', textDecoration: 'none', fontSize: 13, fontWeight: 700 }}>💬 WhatsApp</a>
+            )}
+            <button onClick={() => nav('profile', { r: selRep })} style={{ flex: 1, padding: '10px', borderRadius: 10, border: 'none', background: Y, color: D, fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>Ver perfil</button>
+          </div>
+        </div>
+      )}
+    </div>
+  )
 }
 
 // ============================================================
