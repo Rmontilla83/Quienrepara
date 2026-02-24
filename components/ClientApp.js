@@ -69,7 +69,7 @@ export default function ClientApp({repairers:initReps,categories:initCats,states
     return()=>subscription.unsubscribe()
   },[])
 
-  const cats=[{id:'all',name:'Todas',full_name:'Todas',icon:'🔍'},...(initCats||[]).map(c=>({...c,icon:c.id==='hogar'?'🏠':c.id==='electronica'?'📱':c.id==='automotriz'?'🚗':c.id==='servicios'?'🔧':c.id==='salud'?'🏥':'📋'}))]
+  const cats=[{id:'all',name:'Todas',full_name:'Todas',icon:null},...(initCats||[]).map(c=>({...c,icon:null}))]
   const states=[{id:'all',name:'Todo el País'},...(initStates||[])]
   const catN=(id)=>cats.find(c=>c.id===id)?.full_name||cats.find(c=>c.id===id)?.name||id
   const stN=(id)=>states.find(s=>s.id===id)?.name||id
@@ -104,7 +104,7 @@ export default function ClientApp({repairers:initReps,categories:initCats,states
       </header>
 
       {ad&&<div style={{background:D,color:'#fff',padding:'8px 16px',fontSize:13,textAlign:'center',display:'flex',alignItems:'center',justifyContent:'center',gap:6,flexWrap:'wrap'}}>
-        <span style={{background:Y,color:D,padding:'1px 8px',borderRadius:4,fontWeight:700,fontSize:11}}>📢</span>
+        <span style={{background:Y,color:D,padding:'1px 8px',borderRadius:4,fontWeight:700,fontSize:11}}>AD</span>
         <span>{ad.content}</span>
       </div>}
 
@@ -144,6 +144,21 @@ const SparkleIcon = (p) => <svg width={p.sz||24} height={p.sz||24} viewBox="0 0 
 const PhoneIcon = (p) => <svg width={p.sz||18} height={p.sz||18} viewBox="0 0 24 24" fill="none" stroke={p.c||'currentColor'} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
 const WhatsappIcon = (p) => <svg width={p.sz||18} height={p.sz||18} viewBox="0 0 24 24" fill={p.c||'currentColor'}><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
 
+// Category SVG Icons
+const CatIcon = ({id, sz=28, c}) => {
+  const color = c || CAT_COLORS_FULL[id] || '#6b7280'
+  const icons = {
+    all: <svg width={sz} height={sz} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={2}><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>,
+    hogar: <svg width={sz} height={sz} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>,
+    electronica: <svg width={sz} height={sz} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>,
+    automotriz: <svg width={sz} height={sz} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><path d="M14 16H9m10 0h3v-3.15a1 1 0 00-.84-.99L16 11l-2.7-3.6a1 1 0 00-.8-.4H5.24a2 2 0 00-1.8 1.1l-.8 1.63A6 6 0 002 12.42V16h2"/><circle cx="6.5" cy="16.5" r="2.5"/><circle cx="16.5" cy="16.5" r="2.5"/></svg>,
+    servicios: <svg width={sz} height={sz} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>,
+    salud: <svg width={sz} height={sz} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>,
+  }
+  return icons[id] || icons.all
+}
+const CAT_COLORS_FULL = { hogar: '#3b82f6', electronica: '#8b5cf6', automotriz: '#ef4444', servicios: '#f59e0b', salud: '#22c55e' }
+
 function BN({icon,l,on,ck}){return<button onClick={ck} style={{display:'flex',flexDirection:'column',alignItems:'center',gap:2,border:'none',background:'none',cursor:'pointer',color:on?D:'#9ca3af',padding:'4px 14px'}}>{icon}<span style={{fontSize:10,fontWeight:on?700:500}}>{l}</span></button>}
 
 // ============================================================
@@ -158,25 +173,25 @@ function HomePage({nav,reps,cats}){
         <button onClick={()=>nav('ai')} style={{width:'100%',padding:'18px 24px',borderRadius:50,border:'none',background:PG,color:'#fff',fontSize:17,fontWeight:700,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:10,boxShadow:'0 4px 20px rgba(139,92,246,0.35)'}}><SparkleIcon sz={22} c="#fff" fill="#fff"/> Diagnosticar Falla con IA</button>
         <p style={{textAlign:'center',color:'#94a3b8',fontSize:14,margin:'12px 0 20px'}}>Describe el problema y te decimos a quién llamar</p>
         <div style={{display:'flex',alignItems:'center',gap:12,margin:'0 0 16px'}}><div style={{flex:1,height:1,background:'#e5e7eb'}}/><span style={{color:'#cbd5e1',fontSize:11,fontWeight:700,letterSpacing:1,whiteSpace:'nowrap'}}>O BUSCA MANUALMENTE</span><div style={{flex:1,height:1,background:'#e5e7eb'}}/></div>
-        <button onClick={()=>nav('search')} style={{width:'100%',padding:'14px 16px',borderRadius:12,border:'1.5px solid #e5e7eb',background:'#f8fafc',color:'#94a3b8',fontSize:15,cursor:'pointer',textAlign:'left',display:'flex',alignItems:'center',gap:10}}>🔍 Ej: Electricista, Nevera, Plomero...</button>
+        <button onClick={()=>nav('search')} style={{width:'100%',padding:'14px 16px',borderRadius:12,border:'1.5px solid #e5e7eb',background:'#f8fafc',color:'#94a3b8',fontSize:15,cursor:'pointer',textAlign:'left',display:'flex',alignItems:'center',gap:10}}><SearchIcon sz={18} c="#9ca3af"/> Ej: Electricista, Nevera, Plomero...</button>
       </div>
     </div>
     <div style={{maxWidth:600,margin:'-28px auto 0',padding:'0 16px',position:'relative',zIndex:2}}>
       <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:8}}>
-        {cats.filter(c=>c.id!=='all').map((c,i)=><button key={c.id} onClick={()=>nav('search',{cat:c.id})} className="fade-up" style={{background:'#fff',borderRadius:14,padding:'14px 8px',border:'1px solid #e5e7eb',cursor:'pointer',textAlign:'center',boxShadow:'0 1px 4px rgba(0,0,0,0.04)',transition:'all .15s',animationDelay:`${i*.05}s`}} onMouseOver={e=>{e.currentTarget.style.transform='translateY(-3px)';e.currentTarget.style.boxShadow='0 4px 12px rgba(0,0,0,0.08)'}} onMouseOut={e=>{e.currentTarget.style.transform='';e.currentTarget.style.boxShadow='0 1px 4px rgba(0,0,0,0.04)'}}>
-          <div style={{fontSize:28,marginBottom:4}}>{c.icon}</div><div style={{fontSize:12,fontWeight:600,color:'#374151'}}>{c.name}</div>
+        {cats.filter(c=>c.id!=='all').map((c,i)=><button key={c.id} onClick={()=>nav('search',{cat:c.id})} className="fade-up" style={{background:'#fff',borderRadius:14,padding:'14px 8px',border:'1px solid #e5e7eb',cursor:'pointer',textAlign:'center',boxShadow:'0 1px 4px rgba(0,0,0,0.04)',transition:'all .15s',animationDelay:`${i*.05}s`,display:'flex',flexDirection:'column',alignItems:'center',gap:6}} onMouseOver={e=>{e.currentTarget.style.transform='translateY(-3px)';e.currentTarget.style.boxShadow='0 4px 12px rgba(0,0,0,0.08)'}} onMouseOut={e=>{e.currentTarget.style.transform='';e.currentTarget.style.boxShadow='0 1px 4px rgba(0,0,0,0.04)'}}>
+          <div style={{width:44,height:44,borderRadius:12,background:CAT_COLORS_FULL[c.id]+'15',display:'flex',alignItems:'center',justifyContent:'center'}}><CatIcon id={c.id} sz={24}/></div><div style={{fontSize:12,fontWeight:600,color:'#374151'}}>{c.name}</div>
         </button>)}
       </div>
     </div>
     <div style={{maxWidth:600,margin:'24px auto',padding:'0 16px'}}>
-      <h2 style={{fontSize:16,fontWeight:700,marginBottom:10}}>💡 Problemas comunes</h2>
+      <h2 style={{fontSize:16,fontWeight:700,marginBottom:10}}>Problemas comunes</h2>
       <div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
         {['Mi nevera no enfría','El aire bota agua','Se dañó mi celular','Fuga de agua','Se fue la luz','Carro no arranca'].map(q=><button key={q} onClick={()=>nav('ai')} style={{padding:'8px 14px',borderRadius:20,border:'1px solid #e5e7eb',background:'#fff',color:'#374151',fontSize:13,cursor:'pointer'}}>{q}</button>)}
       </div>
     </div>
     <div style={{maxWidth:600,margin:'20px auto',padding:'0 16px'}}>
       <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10}}>
-        <h2 style={{fontSize:16,fontWeight:700,margin:0}}>⭐ Destacados</h2>
+        <h2 style={{fontSize:16,fontWeight:700,margin:0}}>Destacados</h2>
         <button onClick={()=>nav('search')} style={{border:'none',background:'none',color:PL,fontSize:13,fontWeight:600,cursor:'pointer'}}>Ver todos →</button>
       </div>
       {(premium.length?premium:reps).slice(0,4).map((r,i)=><div key={r.id} className="fade-up" style={{marginBottom:10,animationDelay:`${i*.08}s`}}>
@@ -469,7 +484,7 @@ function SearchPage({nav,reps,q,setQ,catF,setCatF,stF,setStF,cats,states,catN,st
       <input ref={iRef} value={q} onChange={e=>setQ(e.target.value)} placeholder="Buscar servicio, nombre, ciudad..." style={{width:'100%',padding:'14px 14px 14px 44px',borderRadius:12,border:'1.5px solid #e5e7eb',fontSize:15,outline:'none',boxSizing:'border-box',background:'#fff'}} onFocus={e=>e.target.style.borderColor=Y} onBlur={e=>e.target.style.borderColor='#e5e7eb'}/>
     </div>
     <div style={{display:'flex',gap:6,overflowX:'auto',paddingBottom:8,scrollbarWidth:'none'}}>
-      {cats.map(c=><button key={c.id} onClick={()=>setCatF(c.id===catF?'all':c.id)} style={{padding:'8px 14px',borderRadius:20,border:catF===c.id?'none':'1px solid #e5e7eb',background:catF===c.id?D:'#fff',color:catF===c.id?'#fff':'#6b7280',fontSize:13,fontWeight:600,cursor:'pointer',whiteSpace:'nowrap',flexShrink:0}}>{c.icon} {c.name}</button>)}
+      {cats.map(c=><button key={c.id} onClick={()=>setCatF(c.id===catF?'all':c.id)} style={{padding:'8px 14px',borderRadius:20,border:catF===c.id?'none':'1px solid #e5e7eb',background:catF===c.id?D:'#fff',color:catF===c.id?'#fff':'#6b7280',fontSize:13,fontWeight:600,cursor:'pointer',whiteSpace:'nowrap',flexShrink:0,display:'flex',alignItems:'center',gap:5}}><CatIcon id={c.id} sz={16} c={catF===c.id?'#fff':'#6b7280'}/> {c.name}</button>)}
     </div>
     <div style={{padding:'6px 0',display:'flex',alignItems:'center',gap:10}}>
       <select value={stF} onChange={e=>setStF(e.target.value)} style={{padding:'7px 12px',borderRadius:8,border:'1px solid #e5e7eb',fontSize:13,outline:'none',background:'#fff'}}>{states.map(s=><option key={s.id} value={s.id}>{s.name}</option>)}</select>
@@ -478,7 +493,7 @@ function SearchPage({nav,reps,q,setQ,catF,setCatF,stF,setStF,cats,states,catN,st
     <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(320px,1fr))',gap:12,padding:'8px 0 24px'}}>
       {reps.map((r,i)=><div key={r.id} className="fade-up" style={{animationDelay:`${i*.04}s`}}><RepCard r={r} nav={nav} catN={catN} stN={stN}/></div>)}
     </div>
-    {!reps.length&&<div style={{textAlign:'center',padding:60,color:'#9ca3af'}}><p style={{fontSize:40}}>🔍</p><p style={{fontWeight:600}}>No se encontraron resultados</p></div>}
+    {!reps.length&&<div style={{textAlign:'center',padding:60,color:'#9ca3af'}}><SearchIcon sz={40} c="#d1d5db"/><p style={{fontWeight:600,marginTop:12}}>No se encontraron resultados</p></div>}
   </div>
 }
 
@@ -493,9 +508,9 @@ function RepCard({r,nav,catN,stN}){
       <div style={{fontSize:10,fontWeight:700,color:'#9ca3af',letterSpacing:.5,textTransform:'uppercase',marginBottom:4}}>{catN(r.category_id)}</div>
       <h3 onClick={()=>nav('profile',{r})} style={{margin:'0 0 6px',fontSize:16,fontWeight:700,cursor:'pointer',paddingRight:85}}>{r.business_name}</h3>
       <div style={{marginBottom:6}}><Stars rating={r.avg_rating} reviews={r.total_reviews}/></div>
-      <div style={{fontSize:13,color:'#6b7280',marginBottom:4}}>👤 {r.contact_name}</div>
+      <div style={{fontSize:13,color:'#6b7280',marginBottom:4}}>{r.contact_name}</div>
       <p style={{margin:'0 0 8px',color:'#6b7280',fontSize:13,lineHeight:1.5}}>{r.description}</p>
-      <div style={{fontSize:13,color:R,marginBottom:12}}>📍 {r.city}, {stN(r.state_id)}</div>
+      <div style={{fontSize:13,color:R,marginBottom:12,display:'flex',alignItems:'center',gap:4}}><MapIcon sz={14} c={R}/> {r.city}, {stN(r.state_id)}</div>
       <div style={{display:'flex',gap:8}}>
         {r.is_premium?<a href={waUrl(r.phone,`Hola, encontré "${r.business_name}" en QuiénRepara.`)} target="_blank" rel="noreferrer" style={{flex:1,padding:10,borderRadius:10,background:WA,color:'#fff',fontSize:14,fontWeight:700,textDecoration:'none',textAlign:'center',display:'flex',alignItems:'center',justifyContent:'center',gap:6}}><WhatsappIcon c="#fff" sz={16}/> WhatsApp</a>
         :<div style={{flex:1,padding:10,borderRadius:10,background:'#f1f5f9',color:'#94a3b8',fontSize:13,fontWeight:600,textAlign:'center'}}>Contacto premium</div>}
@@ -527,10 +542,10 @@ function ProfilePage({r,nav,catN,stN,user,onLogin}){
         </div>
         <div style={{marginBottom:16}}><Stars rating={r.avg_rating} reviews={r.total_reviews} sz={18}/></div>
         <div style={{display:'flex',flexDirection:'column',gap:8,marginBottom:20,fontSize:14}}>
-          <div>👤 <strong>Contacto:</strong> {r.contact_name}</div>
-          <div style={{color:R}}>📍 {r.city}, {stN(r.state_id)}</div>
-          {r.email&&<div>✉️ {r.email}</div>}
-          {r.is_premium&&r.phone&&<div>📞 {r.phone}</div>}
+          <div><strong>Contacto:</strong> {r.contact_name}</div>
+          <div style={{color:R,display:'flex',alignItems:'center',gap:4}}><MapIcon sz={14} c={R}/> {r.city}, {stN(r.state_id)}</div>
+          {r.email&&<div>{r.email}</div>}
+          {r.is_premium&&r.phone&&<div>{r.phone}</div>}
         </div>
         <p style={{color:'#6b7280',lineHeight:1.7,marginBottom:20,fontSize:15}}>{r.description}</p>
         <div style={{display:'flex',flexDirection:'column',gap:10}}>
@@ -538,7 +553,7 @@ function ProfilePage({r,nav,catN,stN,user,onLogin}){
             <a href={waUrl(r.phone,`Hola, encontré "${r.business_name}" en QuiénRepara. ¿Info sobre sus servicios?`)} target="_blank" rel="noreferrer" style={{padding:14,borderRadius:12,background:WA,color:'#fff',fontSize:16,fontWeight:700,textDecoration:'none',textAlign:'center',display:'flex',alignItems:'center',justifyContent:'center',gap:8}}><WhatsappIcon c="#fff"/> Contactar por WhatsApp</a>
             <a href={`tel:${cleanPh(r.phone)}`} style={{padding:14,borderRadius:12,border:`2px solid ${D}`,color:D,fontSize:16,fontWeight:700,textDecoration:'none',textAlign:'center',display:'flex',alignItems:'center',justifyContent:'center',gap:8}}><PhoneIcon c={D}/> Llamar: {r.phone}</a>
           </>:<div style={{padding:16,borderRadius:12,background:'#f8fafc',border:'1px solid #e5e7eb',textAlign:'center'}}>
-            <p style={{fontWeight:700,marginBottom:4}}>🔒 Contacto restringido</p>
+            <p style={{fontWeight:700,marginBottom:4}}>Contacto restringido</p>
             <p style={{color:'#94a3b8',fontSize:13,marginBottom:8}}>Contacta por email:</p>
             {r.email&&<a href={`mailto:${r.email}`} style={{color:PL,fontWeight:600}}>{r.email}</a>}
           </div>}
@@ -547,7 +562,7 @@ function ProfilePage({r,nav,catN,stN,user,onLogin}){
     </div>
     {/* Reviews placeholder */}
     <div className="fade-up" style={{background:'#fff',borderRadius:18,border:'1px solid #e5e7eb',padding:20,marginTop:12,animationDelay:'.15s'}}>
-      <h3 style={{fontSize:16,fontWeight:700,marginBottom:14}}>💬 Opiniones ({r.total_reviews||0})</h3>
+      <h3 style={{fontSize:16,fontWeight:700,marginBottom:14}}>Opiniones ({r.total_reviews||0})</h3>
       {[{n:'Laura M.',s:5,t:'Excelente servicio, muy puntual y profesional.',d:'Hace 3 días'},{n:'Roberto C.',s:4,t:'Buen trabajo, resolvió rápido.',d:'Hace 1 semana'},{n:'Patricia S.',s:5,t:'100% recomendado. Honesto con precios.',d:'Hace 2 semanas'}].map((rv,i)=><div key={i} style={{padding:'12px 0',borderBottom:i<2?'1px solid #f1f5f9':'none'}}>
         <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:4}}>
           <div style={{display:'flex',alignItems:'center',gap:8}}>
@@ -560,7 +575,7 @@ function ProfilePage({r,nav,catN,stN,user,onLogin}){
       </div>)}
       {/* Leave review CTA */}
       <div style={{marginTop:16,textAlign:'center'}}>
-        {user?<button style={{padding:'10px 20px',borderRadius:10,border:`1.5px solid ${Y}`,background:'#fff',color:D,fontSize:13,fontWeight:600,cursor:'pointer'}}>⭐ Dejar una opinión</button>
+        {user?<button style={{padding:'10px 20px',borderRadius:10,border:`1.5px solid ${Y}`,background:'#fff',color:D,fontSize:13,fontWeight:600,cursor:'pointer'}}>Dejar una opinión</button>
         :<button onClick={onLogin} style={{padding:'10px 20px',borderRadius:10,border:'1.5px solid #e5e7eb',background:'#fff',color:'#94a3b8',fontSize:13,fontWeight:600,cursor:'pointer'}}>Inicia sesión para opinar</button>}
       </div>
     </div>

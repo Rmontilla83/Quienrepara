@@ -82,8 +82,8 @@ export default function AuthModal({ onClose, onAuth }) {
         <button onClick={onClose} style={{ position:'absolute',top:12,right:16,border:'none',background:'none',fontSize:24,cursor:'pointer',color:'#94a3b8' }}>×</button>
         
         <div style={{ textAlign:'center',marginBottom:24 }}>
-          <div style={{ width:48,height:48,borderRadius:14,background:PG,display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 12px',fontSize:24 }}>
-            {mode === 'login' ? '👋' : mode === 'register' ? '🚀' : '🔑'}
+          <div style={{ width:48,height:48,borderRadius:14,background:PG,display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 12px' }}>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
           </div>
           <h2 style={{ fontSize:22,fontWeight:700,margin:0 }}>
             {mode === 'login' ? 'Iniciar Sesión' : mode === 'register' ? 'Crear Cuenta' : 'Recuperar Contraseña'}
@@ -116,12 +116,12 @@ export default function AuthModal({ onClose, onAuth }) {
         {mode === 'register' && !success && (
           <div style={{ display:'flex',gap:8,marginBottom:20 }}>
             <button onClick={()=>setRole('client')} style={{ flex:1,padding:'12px',borderRadius:12,border:role==='client'?`2px solid ${PL}`:'2px solid #e5e7eb',background:role==='client'?'#f5f3ff':'#fff',cursor:'pointer',textAlign:'center' }}>
-              <div style={{ fontSize:24,marginBottom:4 }}>🔍</div>
+              <div style={{ marginBottom:4,display:'flex',justifyContent:'center' }}><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke={role==='client'?PL:'#6b7280'} strokeWidth="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>
               <div style={{ fontSize:13,fontWeight:700,color:role==='client'?PL:D }}>Busco reparador</div>
               <div style={{ fontSize:11,color:'#94a3b8' }}>Soy cliente</div>
             </button>
             <button onClick={()=>setRole('repairer')} style={{ flex:1,padding:'12px',borderRadius:12,border:role==='repairer'?`2px solid ${Y}`:'2px solid #e5e7eb',background:role==='repairer'?'#fffbeb':'#fff',cursor:'pointer',textAlign:'center' }}>
-              <div style={{ fontSize:24,marginBottom:4 }}>🔧</div>
+              <div style={{ marginBottom:4,display:'flex',justifyContent:'center' }}><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke={role==='repairer'?'#92400e':'#6b7280'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg></div>
               <div style={{ fontSize:13,fontWeight:700,color:role==='repairer'?'#92400e':D }}>Soy reparador</div>
               <div style={{ fontSize:11,color:'#94a3b8' }}>Quiero clientes</div>
             </button>
