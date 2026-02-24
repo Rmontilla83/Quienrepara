@@ -121,20 +121,30 @@ export default function ClientApp({repairers:initReps,categories:initCats,states
 
       {/* Bottom Nav */}
       <nav style={{position:'fixed',bottom:0,left:0,right:0,background:'#fff',borderTop:'1px solid #e5e7eb',display:'flex',justifyContent:'space-around',alignItems:'center',padding:'6px 0 max(env(safe-area-inset-bottom),8px)',zIndex:50,boxShadow:'0 -2px 10px rgba(0,0,0,0.05)'}}>
-        <BN i="🏠" l="Inicio" on={tab==='home'} ck={()=>{setTab('home');setCatF('all');setQ('')}}/>
-        <BN i="🔍" l="Buscar" on={tab==='search'} ck={()=>setTab('search')}/>
+        <BN icon={<HomeIcon sz={22} c={tab==='home'?D:'#9ca3af'}/>} l="Inicio" on={tab==='home'} ck={()=>{setTab('home');setCatF('all');setQ('')}}/>
+        <BN icon={<SearchIcon sz={22} c={tab==='search'?D:'#9ca3af'}/>} l="Buscar" on={tab==='search'} ck={()=>setTab('search')}/>
         <div style={{position:'relative',top:-18}}>
-          <button onClick={()=>setTab('ai')} style={{width:56,height:56,borderRadius:'50%',border:'4px solid #f8fafc',background:PG,color:'#fff',fontSize:24,display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer',boxShadow:'0 4px 15px rgba(139,92,246,0.4)'}}>✨</button>
+          <button onClick={()=>setTab('ai')} style={{width:56,height:56,borderRadius:'50%',border:'4px solid #f8fafc',background:PG,color:'#fff',fontSize:24,display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer',boxShadow:'0 4px 15px rgba(139,92,246,0.4)'}}><SparkleIcon sz={26} c="#fff" fill="#fff"/></button>
           <div style={{textAlign:'center',fontSize:10,fontWeight:600,color:tab==='ai'?PL:'#9ca3af',marginTop:2}}>IA</div>
         </div>
-        <BN i="📍" l="Mapa" on={tab==='map'} ck={()=>setTab('map')}/>
-        <BN i="👤" l="Perfil" on={tab==='dashboard'} ck={handleProfile}/>
+        <BN icon={<MapIcon sz={22} c={tab==='map'?D:'#9ca3af'}/>} l="Mapa" on={tab==='map'} ck={()=>setTab('map')}/>
+        <BN icon={<UserIcon sz={22} c={tab==='dashboard'?D:'#9ca3af'}/>} l="Perfil" on={tab==='dashboard'} ck={handleProfile}/>
       </nav>
     </div>
   )
 }
 
-function BN({i,l,on,ck}){return<button onClick={ck} style={{display:'flex',flexDirection:'column',alignItems:'center',gap:1,border:'none',background:'none',cursor:'pointer',color:on?D:'#9ca3af',padding:'4px 14px'}}><span style={{fontSize:22}}>{i}</span><span style={{fontSize:10,fontWeight:on?700:500}}>{l}</span></button>}
+// SVG Icons
+const Icon = ({ d, sz = 24, c = 'currentColor', ...p }) => <svg width={sz} height={sz} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" {...p}><path d={d} /></svg>
+const HomeIcon = (p) => <svg width={p.sz||24} height={p.sz||24} viewBox="0 0 24 24" fill="none" stroke={p.c||'currentColor'} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+const SearchIcon = (p) => <svg width={p.sz||24} height={p.sz||24} viewBox="0 0 24 24" fill="none" stroke={p.c||'currentColor'} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+const MapIcon = (p) => <svg width={p.sz||24} height={p.sz||24} viewBox="0 0 24 24" fill="none" stroke={p.c||'currentColor'} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+const UserIcon = (p) => <svg width={p.sz||24} height={p.sz||24} viewBox="0 0 24 24" fill="none" stroke={p.c||'currentColor'} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+const SparkleIcon = (p) => <svg width={p.sz||24} height={p.sz||24} viewBox="0 0 24 24" fill={p.fill||'none'} stroke={p.c||'currentColor'} strokeWidth={2}><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8l-6.2 4.5 2.4-7.4L2 9.4h7.6z"/></svg>
+const PhoneIcon = (p) => <svg width={p.sz||18} height={p.sz||18} viewBox="0 0 24 24" fill="none" stroke={p.c||'currentColor'} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+const WhatsappIcon = (p) => <svg width={p.sz||18} height={p.sz||18} viewBox="0 0 24 24" fill={p.c||'currentColor'}><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+
+function BN({icon,l,on,ck}){return<button onClick={ck} style={{display:'flex',flexDirection:'column',alignItems:'center',gap:2,border:'none',background:'none',cursor:'pointer',color:on?D:'#9ca3af',padding:'4px 14px'}}>{icon}<span style={{fontSize:10,fontWeight:on?700:500}}>{l}</span></button>}
 
 // ============================================================
 // HOME
@@ -145,7 +155,7 @@ function HomePage({nav,reps,cats}){
     <div style={{background:`linear-gradient(180deg,${Y} 0%,${YD} 100%)`,padding:'28px 16px 52px'}}>
       <div style={{maxWidth:600,margin:'0 auto',background:'#fff',borderRadius:20,padding:'36px 24px',boxShadow:'0 8px 30px rgba(0,0,0,0.12)'}}>
         <h1 style={{textAlign:'center',fontSize:26,fontWeight:800,margin:'0 0 24px',lineHeight:1.3}}>¿Qué necesitas reparar hoy?</h1>
-        <button onClick={()=>nav('ai')} style={{width:'100%',padding:'18px 24px',borderRadius:50,border:'none',background:PG,color:'#fff',fontSize:17,fontWeight:700,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:10,boxShadow:'0 4px 20px rgba(139,92,246,0.35)'}}>✨ Diagnosticar Falla con IA</button>
+        <button onClick={()=>nav('ai')} style={{width:'100%',padding:'18px 24px',borderRadius:50,border:'none',background:PG,color:'#fff',fontSize:17,fontWeight:700,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:10,boxShadow:'0 4px 20px rgba(139,92,246,0.35)'}}><SparkleIcon sz={22} c="#fff" fill="#fff"/> Diagnosticar Falla con IA</button>
         <p style={{textAlign:'center',color:'#94a3b8',fontSize:14,margin:'12px 0 20px'}}>Describe el problema y te decimos a quién llamar</p>
         <div style={{display:'flex',alignItems:'center',gap:12,margin:'0 0 16px'}}><div style={{flex:1,height:1,background:'#e5e7eb'}}/><span style={{color:'#cbd5e1',fontSize:11,fontWeight:700,letterSpacing:1,whiteSpace:'nowrap'}}>O BUSCA MANUALMENTE</span><div style={{flex:1,height:1,background:'#e5e7eb'}}/></div>
         <button onClick={()=>nav('search')} style={{width:'100%',padding:'14px 16px',borderRadius:12,border:'1.5px solid #e5e7eb',background:'#f8fafc',color:'#94a3b8',fontSize:15,cursor:'pointer',textAlign:'left',display:'flex',alignItems:'center',gap:10}}>🔍 Ej: Electricista, Nevera, Plomero...</button>
@@ -434,10 +444,10 @@ function MapPage({ reps, cats, nav, catN, stN }) {
           <p style={{ margin: '8px 0', fontSize: 13, color: '#6b7280', lineHeight: 1.5 }}>{selRep.description?.slice(0, 100)}{selRep.description?.length > 100 ? '...' : ''}</p>
           <div style={{ display: 'flex', gap: 8 }}>
             {selRep.phone && selRep.phone !== 'verificar' && (
-              <a href={`tel:${selRep.phone}`} style={{ flex: 1, padding: '10px', borderRadius: 10, background: '#22c55e', color: '#fff', textAlign: 'center', textDecoration: 'none', fontSize: 13, fontWeight: 700 }}>📞 Llamar</a>
+              <a href={`tel:${selRep.phone}`} style={{ flex: 1, padding: '10px', borderRadius: 10, background: '#22c55e', color: '#fff', textAlign: 'center', textDecoration: 'none', fontSize: 13, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}><PhoneIcon c="#fff"/> Llamar</a>
             )}
             {selRep.whatsapp && (
-              <a href={`https://wa.me/${selRep.whatsapp.replace(/[^0-9]/g, '')}`} target="_blank" style={{ flex: 1, padding: '10px', borderRadius: 10, background: '#25d366', color: '#fff', textAlign: 'center', textDecoration: 'none', fontSize: 13, fontWeight: 700 }}>💬 WhatsApp</a>
+              <a href={`https://wa.me/${selRep.whatsapp.replace(/[^0-9]/g, '')}`} target="_blank" style={{ flex: 1, padding: '10px', borderRadius: 10, background: '#25d366', color: '#fff', textAlign: 'center', textDecoration: 'none', fontSize: 13, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}><WhatsappIcon c="#fff"/> WhatsApp</a>
             )}
             <button onClick={() => nav('profile', { r: selRep })} style={{ flex: 1, padding: '10px', borderRadius: 10, border: 'none', background: Y, color: D, fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>Ver perfil</button>
           </div>
@@ -487,8 +497,8 @@ function RepCard({r,nav,catN,stN}){
       <p style={{margin:'0 0 8px',color:'#6b7280',fontSize:13,lineHeight:1.5}}>{r.description}</p>
       <div style={{fontSize:13,color:R,marginBottom:12}}>📍 {r.city}, {stN(r.state_id)}</div>
       <div style={{display:'flex',gap:8}}>
-        {r.is_premium?<a href={waUrl(r.phone,`Hola, encontré "${r.business_name}" en QuiénRepara.`)} target="_blank" rel="noreferrer" style={{flex:1,padding:10,borderRadius:10,background:WA,color:'#fff',fontSize:14,fontWeight:700,textDecoration:'none',textAlign:'center'}}>💬 WhatsApp</a>
-        :<div style={{flex:1,padding:10,borderRadius:10,background:'#f1f5f9',color:'#94a3b8',fontSize:13,fontWeight:600,textAlign:'center'}}>🔒 Contacto premium</div>}
+        {r.is_premium?<a href={waUrl(r.phone,`Hola, encontré "${r.business_name}" en QuiénRepara.`)} target="_blank" rel="noreferrer" style={{flex:1,padding:10,borderRadius:10,background:WA,color:'#fff',fontSize:14,fontWeight:700,textDecoration:'none',textAlign:'center',display:'flex',alignItems:'center',justifyContent:'center',gap:6}}><WhatsappIcon c="#fff" sz={16}/> WhatsApp</a>
+        :<div style={{flex:1,padding:10,borderRadius:10,background:'#f1f5f9',color:'#94a3b8',fontSize:13,fontWeight:600,textAlign:'center'}}>Contacto premium</div>}
         <button onClick={()=>nav('profile',{r})} style={{padding:'10px 14px',borderRadius:10,border:'1px solid #e5e7eb',background:'#fff',color:D,fontSize:13,fontWeight:600,cursor:'pointer'}}>Ver perfil</button>
       </div>
     </div>
@@ -525,8 +535,8 @@ function ProfilePage({r,nav,catN,stN,user,onLogin}){
         <p style={{color:'#6b7280',lineHeight:1.7,marginBottom:20,fontSize:15}}>{r.description}</p>
         <div style={{display:'flex',flexDirection:'column',gap:10}}>
           {r.is_premium&&r.phone?<>
-            <a href={waUrl(r.phone,`Hola, encontré "${r.business_name}" en QuiénRepara. ¿Info sobre sus servicios?`)} target="_blank" rel="noreferrer" style={{padding:14,borderRadius:12,background:WA,color:'#fff',fontSize:16,fontWeight:700,textDecoration:'none',textAlign:'center'}}>💬 Contactar por WhatsApp</a>
-            <a href={`tel:${cleanPh(r.phone)}`} style={{padding:14,borderRadius:12,border:`2px solid ${D}`,color:D,fontSize:16,fontWeight:700,textDecoration:'none',textAlign:'center'}}>📞 Llamar: {r.phone}</a>
+            <a href={waUrl(r.phone,`Hola, encontré "${r.business_name}" en QuiénRepara. ¿Info sobre sus servicios?`)} target="_blank" rel="noreferrer" style={{padding:14,borderRadius:12,background:WA,color:'#fff',fontSize:16,fontWeight:700,textDecoration:'none',textAlign:'center',display:'flex',alignItems:'center',justifyContent:'center',gap:8}}><WhatsappIcon c="#fff"/> Contactar por WhatsApp</a>
+            <a href={`tel:${cleanPh(r.phone)}`} style={{padding:14,borderRadius:12,border:`2px solid ${D}`,color:D,fontSize:16,fontWeight:700,textDecoration:'none',textAlign:'center',display:'flex',alignItems:'center',justifyContent:'center',gap:8}}><PhoneIcon c={D}/> Llamar: {r.phone}</a>
           </>:<div style={{padding:16,borderRadius:12,background:'#f8fafc',border:'1px solid #e5e7eb',textAlign:'center'}}>
             <p style={{fontWeight:700,marginBottom:4}}>🔒 Contacto restringido</p>
             <p style={{color:'#94a3b8',fontSize:13,marginBottom:8}}>Contacta por email:</p>
