@@ -1,13 +1,17 @@
 'use client'
 import { useState, useEffect } from 'react'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { getSupabaseClient } from '@/lib/supabase'
+import { useAuth } from '@/contexts/AuthContext'
+import { Y, YD, YL, PG, PL, G, GL, D, R } from '@/lib/theme'
 
-const Y="#fbbf24",YD="#f59e0b",YL="#fef3c7",PG="linear-gradient(135deg,#8b5cf6,#6d28d9)",PL="#8b5cf6",G="#22c55e",GL="#dcfce7",D="#0f172a",R="#ef4444",WA="#25D366"
-
-const CATS=[{id:'hogar',n:'Hogar 🏠'},{id:'electronica',n:'Electrónica 📱'},{id:'automotriz',n:'Automotriz 🚗'},{id:'servicios',n:'Servicios 🔧'},{id:'salud',n:'Eq. Médicos 🏥'}]
+const CATS=[{id:'hogar',n:'Hogar'},{id:'electronica',n:'Electrónica'},{id:'automotriz',n:'Automotriz'},{id:'servicios',n:'Servicios'},{id:'salud',n:'Eq. Médicos'}]
 const STATES=[{id:'an',n:'Anzoátegui'},{id:'dc',n:'Distrito Capital'},{id:'mi',n:'Miranda'},{id:'zu',n:'Zulia'},{id:'ca',n:'Carabobo'},{id:'la',n:'Lara'},{id:'ar',n:'Aragua'},{id:'bo',n:'Bolívar'},{id:'ne',n:'Nueva Esparta'},{id:'ta',n:'Táchira'}]
 
-export default function Dashboard({ user, role, onBack, onLogout, onAdmin }) {
+export default function Dashboard() {
+  const { user, userRole: role, logout } = useAuth()
+  const router = useRouter()
   const [rep, setRep] = useState(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -54,13 +58,14 @@ export default function Dashboard({ user, role, onBack, onLogout, onAdmin }) {
 
   function upd(k, v) { setRep(prev => ({ ...prev, [k]: v })) }
 
+  if (!user) { router.push('/'); return null }
   if (loading) return <div style={{ padding: 40, textAlign: 'center', color: '#94a3b8' }}>Cargando...</div>
 
   const isRepairer = profile?.role === 'repairer'
 
   return (
     <div style={{ maxWidth: 600, margin: '0 auto', padding: 16 }}>
-      <button onClick={onBack} style={{ border: 'none', background: 'none', color: '#94a3b8', fontSize: 14, cursor: 'pointer', marginBottom: 12, padding: 0 }}>← Volver</button>
+      <Link href="/" style={{ border: 'none', background: 'none', color: '#94a3b8', fontSize: 14, cursor: 'pointer', marginBottom: 12, padding: 0, display: 'inline-block', textDecoration: 'none' }}>← Volver</Link>
 
       {/* User Card */}
       <div style={{ background: '#fff', borderRadius: 18, border: '1px solid #e5e7eb', padding: 24, marginBottom: 16 }}>
@@ -76,8 +81,8 @@ export default function Dashboard({ user, role, onBack, onLogout, onAdmin }) {
             </span>
           </div>
         </div>
-        {role==='admin'&&<button onClick={onAdmin} style={{ padding: '10px 20px', borderRadius: 10, border: '2px solid #dc2626', background: '#fff', color: '#dc2626', fontSize: 13, fontWeight: 600, cursor: 'pointer', width: '100%', marginBottom: 10, display:'flex', alignItems:'center', justifyContent:'center', gap:6 }}>🛡️ Panel de Administración</button>}
-        <button onClick={onLogout} style={{ padding: '10px 20px', borderRadius: 10, border: '1px solid #fecaca', background: '#fff', color: R, fontSize: 13, fontWeight: 600, cursor: 'pointer', width: '100%' }}>Cerrar Sesión</button>
+        {role==='admin'&&<Link href="/admin" style={{ padding: '10px 20px', borderRadius: 10, border: '2px solid #dc2626', background: '#fff', color: '#dc2626', fontSize: 13, fontWeight: 600, cursor: 'pointer', width: '100%', marginBottom: 10, display:'flex', alignItems:'center', justifyContent:'center', gap:6, textDecoration:'none' }}>Panel de Administración</Link>}
+        <button onClick={() => { logout(); router.push('/') }} style={{ padding: '10px 20px', borderRadius: 10, border: '1px solid #fecaca', background: '#fff', color: R, fontSize: 13, fontWeight: 600, cursor: 'pointer', width: '100%' }}>Cerrar Sesión</button>
       </div>
 
       {/* Repairer Dashboard */}

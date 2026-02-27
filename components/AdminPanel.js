@@ -1,13 +1,17 @@
 'use client'
 import { useState, useEffect, useRef } from 'react'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { getSupabaseClient } from '@/lib/supabase'
-
-const Y="#fbbf24",YD="#f59e0b",YL="#fef3c7",PG="linear-gradient(135deg,#8b5cf6,#6d28d9)",PL="#8b5cf6",G="#22c55e",GL="#dcfce7",D="#0f172a",R="#ef4444"
+import { useAuth } from '@/contexts/AuthContext'
+import { Y, YD, YL, PG, PL, G, GL, D, R } from '@/lib/theme'
 
 const CATS=[{id:'hogar',n:'Hogar'},{id:'electronica',n:'Electrónica'},{id:'automotriz',n:'Automotriz'},{id:'servicios',n:'Servicios'},{id:'salud',n:'Salud'}]
 const STATES=[{id:'an',n:'Anzoátegui'},{id:'dc',n:'Distrito Capital'},{id:'mi',n:'Miranda'},{id:'zu',n:'Zulia'},{id:'ca',n:'Carabobo'},{id:'la',n:'Lara'},{id:'ar',n:'Aragua'},{id:'bo',n:'Bolívar'},{id:'ne',n:'Nueva Esparta'},{id:'ta',n:'Táchira'}]
 
-export default function AdminPanel({ user, onBack }) {
+export default function AdminPanel() {
+  const { user, userRole } = useAuth()
+  const router = useRouter()
   const [tab, setTab] = useState('overview')
   const [reps, setReps] = useState([])
   const [pending, setPending] = useState([])
@@ -37,9 +41,11 @@ export default function AdminPanel({ user, onBack }) {
     setLoading(false)
   }
 
+  if (!user || userRole !== 'admin') { router.push('/dashboard'); return null }
+
   return (
     <div style={{ maxWidth: 900, margin: '0 auto', padding: 16 }}>
-      <button onClick={onBack} style={{ border: 'none', background: 'none', color: '#94a3b8', fontSize: 14, cursor: 'pointer', marginBottom: 12, padding: 0 }}>← Volver al perfil</button>
+      <Link href="/dashboard" style={{ border: 'none', background: 'none', color: '#94a3b8', fontSize: 14, cursor: 'pointer', marginBottom: 12, padding: 0, display: 'inline-block', textDecoration: 'none' }}>← Volver al perfil</Link>
 
       <div style={{ background: '#fff', borderRadius: 18, border: '1px solid #e5e7eb', padding: 24, marginBottom: 16 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>

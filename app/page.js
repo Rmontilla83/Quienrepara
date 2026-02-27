@@ -1,28 +1,28 @@
-import { supabase } from '@/lib/supabase'
-import ClientApp from '@/components/ClientApp'
+import Link from 'next/link'
+import { getRepairers, getCategories, getAd } from '@/lib/data'
+import HomeClient from '@/components/HomeClient'
 
 export const revalidate = 3600
 
+export const metadata = {
+  title: 'QuiénRepara — Encuentra Reparadores en Venezuela',
+  description: 'Directorio de técnicos y reparadores verificados en Anzoátegui, Venezuela. Electricistas, plomeros, técnicos de aires, mecánicos y más.',
+  openGraph: {
+    title: 'QuiénRepara — Directorio de Reparadores',
+    description: 'Encuentra el técnico que necesitas en Anzoátegui, Venezuela. Diagnóstico IA gratuito.',
+    url: 'https://www.quienrepara.com',
+    siteName: 'QuiénRepara',
+    locale: 'es_VE',
+    type: 'website',
+  },
+}
+
 export default async function Home() {
-  let repairers = [], categories = [], states = [], ad = null
+  const [repairers, categories, ad] = await Promise.all([
+    getRepairers(),
+    getCategories(),
+    getAd(),
+  ])
 
-  if (supabase) {
-    const [repRes, catRes, stRes, adRes] = await Promise.all([
-      supabase.from('repairers').select('*').eq('is_active', true).order('is_premium', { ascending: false }).order('avg_rating', { ascending: false }).limit(100),
-      supabase.from('categories').select('*').order('sort_order'),
-      supabase.from('states').select('*').order('name'),
-      supabase.from('ads').select('*').eq('is_active', true).limit(1),
-    ])
-    repairers = repRes.data || []
-    categories = catRes.data || []
-    states = stRes.data || []
-    ad = adRes.data?.[0] || null
-  }
-
-  return <ClientApp
-    repairers={repairers}
-    categories={categories}
-    states={states}
-    ad={ad}
-  />
+  return <HomeClient repairers={repairers} categories={categories} ad={ad} />
 }
