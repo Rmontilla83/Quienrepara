@@ -28,7 +28,7 @@ function diagnose(m){const l=m.toLowerCase()
   if(l.match(/aire|acondicionado|split|bota agua/))return{t:'Problema de **aire acondicionado**. Bota agua: drenaje tapado. No enfría: gas o compresor.',c:'hogar',tip:'Limpia los filtros y verifica que el drenaje no esté obstruido.',u:'media',cost:'$20–$100'}
   if(l.match(/celular|pantalla|iphone|samsung|carga|bater/))return{t:'Problema de **celular**. Pantalla rota, puerto de carga o batería.',c:'electronica',tip:'Si no carga, prueba otro cable y limpia el puerto con cepillo suave.',u:'baja',cost:'$10–$60'}
   if(l.match(/tuber|agua|grifo|ba[ñn]o|inodoro|plomer|fuga|gotea/))return{t:'**¡Urgente!** Problema de plomería. Cierra la llave de paso AHORA.',c:'hogar',tip:'Cierra la llave de paso y coloca un recipiente bajo la fuga.',u:'alta',cost:'$15–$80'}
-  if(l.match(/electric|corriente|enchufe|breaker|corto|luz/))return{t:'**⚠️ Precaución** — Problema eléctrico. No toques cables expuestos.',c:'hogar',tip:'Revisa si algún breaker se disparó. Desconecta equipos sospechosos.',u:'alta',cost:'$20–$100'}
+  if(l.match(/electric|corriente|enchufe|breaker|corto|luz/))return{t:'**Precaución** — Problema eléctrico. No toques cables expuestos.',c:'hogar',tip:'Revisa si algún breaker se disparó. Desconecta equipos sospechosos.',u:'alta',cost:'$20–$100'}
   if(l.match(/comput|laptop|pc|virus|lent|wifi/))return{t:'Problema de **computación**. Hardware (disco, RAM) o software (virus).',c:'electronica',tip:'Reinicia el equipo. Si está lento, verifica espacio en disco.',u:'baja',cost:'$15–$80'}
   if(l.match(/carro|motor|freno|mec[aá]nic|arranc|aceite/))return{t:'Problema **mecánico**. No arranca: batería. Ruidos: frenos o suspensión.',c:'automotriz',tip:'Verifica si las luces del tablero encienden al girar la llave.',u:'media',cost:'$30–$200'}
   if(l.match(/tv|televisor|sonido|audio/))return{t:'Problema de **TV/Audio**. No enciende: fuente de poder. Sin imagen: backlight.',c:'electronica',tip:'Desconecta 30 segundos y reconecta.',u:'baja',cost:'$20–$100'}
@@ -235,20 +235,28 @@ function AIPage({nav,catN}){
   const send=async()=>{if(!inp.trim()||typ)return;const t=inp.trim();setInp('');setMsgs(p=>[...p,{rl:'user',tx:t}]);setTyp(true)
     histRef.current.push({role:'user',text:t})
     try{
-      const res=await fetch('/api/diagnose',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:t,history:histRef.current.slice(-6)})})
+      const sb=getSupabaseClient()
+      const{data:{session}}=await sb.auth.getSession()
+      const headers={'Content-Type':'application/json'}
+      if(session?.access_token)headers['Authorization']=`Bearer ${session.access_token}`
+      const res=await fetch('/api/diagnose',{method:'POST',headers,body:JSON.stringify({message:t,history:histRef.current.slice(-6)})})
+      if(res.status===401||res.status===429){
+        const r=diagnose(t)
+        setMsgs(p=>[...p,{rl:'ai',tx:r.t,tip:r.tip,c:r.c,u:r.u,cost:r.cost}])
+        setTyp(false);return
+      }
       const data=await res.json()
       if(data.error){setMsgs(p=>[...p,{rl:'ai',tx:'Lo siento, hubo un error. Intenta de nuevo.'}]);setTyp(false);return}
       const aiText=data.diagnostico||(data.preguntas||'Cuéntame más sobre el problema.')
       histRef.current.push({role:'ai',text:aiText})
       setMsgs(p=>[...p,{rl:'ai',tx:aiText,tip:data.consejo,c:data.categoria,u:data.urgencia,cost:data.costo_estimado}])
     }catch(e){
-      // Fallback to local diagnosis
       const r=diagnose(t)
       setMsgs(p=>[...p,{rl:'ai',tx:r.t,tip:r.tip,c:r.c,u:r.u,cost:r.cost}])
     }
     setTyp(false)
   }
-  const md=t=>t.split('\n').map((l,i)=>{let h=l.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\*(.+?)\*/g,'<em>$1</em>').replace(/^• /,'&bull; ');return<p key={i} style={{margin:'3px 0',lineHeight:1.65}} dangerouslySetInnerHTML={{__html:h||'&nbsp;'}}/>})
+  const md=t=>t.split('\n').map((l,i)=>{let h=l.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\*(.+?)\*/g,'<em>$1</em>').replace(/^• /,'&bull; ');return<p key={i} style={{margin:'3px 0',lineHeight:1.65}} dangerouslySetInnerHTML={{__html:h||'&nbsp;'}}/>})
 
   return<div style={{maxWidth:600,margin:'0 auto',display:'flex',flexDirection:'column',height:'calc(100dvh - 170px)'}}>
     <div style={{padding:16,textAlign:'center',borderBottom:'1px solid #e5e7eb',background:'#fff'}}>
@@ -560,21 +568,17 @@ function ProfilePage({r,nav,catN,stN,user,onLogin}){
         </div>
       </div>
     </div>
-    {/* Reviews placeholder */}
+    {/* Reviews */}
     <div className="fade-up" style={{background:'#fff',borderRadius:18,border:'1px solid #e5e7eb',padding:20,marginTop:12,animationDelay:'.15s'}}>
       <h3 style={{fontSize:16,fontWeight:700,marginBottom:14}}>Opiniones ({r.total_reviews||0})</h3>
-      {[{n:'Laura M.',s:5,t:'Excelente servicio, muy puntual y profesional.',d:'Hace 3 días'},{n:'Roberto C.',s:4,t:'Buen trabajo, resolvió rápido.',d:'Hace 1 semana'},{n:'Patricia S.',s:5,t:'100% recomendado. Honesto con precios.',d:'Hace 2 semanas'}].map((rv,i)=><div key={i} style={{padding:'12px 0',borderBottom:i<2?'1px solid #f1f5f9':'none'}}>
-        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:4}}>
-          <div style={{display:'flex',alignItems:'center',gap:8}}>
-            <div style={{width:28,height:28,borderRadius:'50%',background:avc(rv.n),display:'flex',alignItems:'center',justifyContent:'center',color:'#fff',fontSize:11,fontWeight:700}}>{ini(rv.n)}</div>
-            <span style={{fontWeight:600,fontSize:13}}>{rv.n}</span><Stars rating={rv.s} reviews={1} sz={11}/>
-          </div>
-          <span style={{fontSize:11,color:'#cbd5e1'}}>{rv.d}</span>
+      {r.total_reviews>0?null:(
+        <div style={{textAlign:'center',padding:'20px 0',color:'#94a3b8'}}>
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" strokeWidth="1.5" style={{margin:'0 auto 12px',display:'block'}}><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          <p style={{fontSize:14,marginBottom:4}}>Aún no hay opiniones</p>
+          <p style={{fontSize:12}}>Sé el primero en compartir tu experiencia</p>
         </div>
-        <p style={{margin:0,color:'#6b7280',fontSize:13,paddingLeft:36}}>{rv.t}</p>
-      </div>)}
-      {/* Leave review CTA */}
-      <div style={{marginTop:16,textAlign:'center'}}>
+      )}
+      <div style={{marginTop:12,textAlign:'center'}}>
         {user?<button style={{padding:'10px 20px',borderRadius:10,border:`1.5px solid ${Y}`,background:'#fff',color:D,fontSize:13,fontWeight:600,cursor:'pointer'}}>Dejar una opinión</button>
         :<button onClick={onLogin} style={{padding:'10px 20px',borderRadius:10,border:'1.5px solid #e5e7eb',background:'#fff',color:'#94a3b8',fontSize:13,fontWeight:600,cursor:'pointer'}}>Inicia sesión para opinar</button>}
       </div>

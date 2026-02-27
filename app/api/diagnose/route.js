@@ -1,7 +1,36 @@
 import { NextResponse } from 'next/server'
+import { createClient } from '@supabase/supabase-js'
 
 const GEMINI_KEY = process.env.GEMINI_API_KEY
 const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent'
+
+// Rate limiter en memoria
+const rateLimit = new Map()
+const RATE_LIMIT_WINDOW = 60 * 1000 // 1 minuto
+const RATE_LIMIT_MAX = 5 // 5 requests por minuto
+
+function checkRateLimit(identifier) {
+  const now = Date.now()
+  const windowStart = now - RATE_LIMIT_WINDOW
+  const requests = rateLimit.get(identifier) || []
+  const recentRequests = requests.filter(time => time > windowStart)
+
+  if (recentRequests.length >= RATE_LIMIT_MAX) {
+    return false
+  }
+
+  recentRequests.push(now)
+  rateLimit.set(identifier, recentRequests)
+
+  // Limpiar entradas viejas periódicamente
+  if (rateLimit.size > 1000) {
+    for (const [key, times] of rateLimit) {
+      if (times.every(t => t < windowStart)) rateLimit.delete(key)
+    }
+  }
+
+  return true
+}
 
 const SYSTEM_PROMPT = `Eres el asistente de diagnóstico de QuiénRepara, una app venezolana para encontrar técnicos y reparadores en Anzoátegui, Venezuela.
 
@@ -34,7 +63,37 @@ IMPORTANTE: Solo responde con el JSON, sin markdown, sin backticks, sin explicac
 
 export async function POST(request) {
   try {
+    // Verificar autenticación
+    const authHeader = request.headers.get('authorization')
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
+    }
+
+    const token = authHeader.replace('Bearer ', '')
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+      { global: { headers: { Authorization: `Bearer ${token}` } } }
+    )
+
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    if (authError || !user) {
+      return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
+    }
+
+    // Rate limit por usuario
+    if (!checkRateLimit(user.id)) {
+      return NextResponse.json(
+        { error: 'Demasiadas solicitudes. Espera un momento.' },
+        { status: 429 }
+      )
+    }
+
     const { message, history } = await request.json()
+
+    if (!message || typeof message !== 'string' || message.length > 1000) {
+      return NextResponse.json({ error: 'Mensaje inválido' }, { status: 400 })
+    }
 
     if (!GEMINI_KEY) {
       return NextResponse.json({ error: 'API key not configured' }, { status: 500 })
@@ -42,14 +101,16 @@ export async function POST(request) {
 
     // Build conversation context
     const contents = []
-    
+
     // Add history if exists
-    if (history && history.length) {
-      for (const msg of history) {
-        contents.push({
-          role: msg.role === 'ai' ? 'model' : 'user',
-          parts: [{ text: msg.text }]
-        })
+    if (history && Array.isArray(history)) {
+      for (const msg of history.slice(-6)) {
+        if (msg.role && msg.text) {
+          contents.push({
+            role: msg.role === 'ai' ? 'model' : 'user',
+            parts: [{ text: String(msg.text).slice(0, 1000) }]
+          })
+        }
       }
     }
 
@@ -73,7 +134,7 @@ export async function POST(request) {
 
     const res = await fetch(`${GEMINI_URL}`, {
       method: 'POST',
-      headers: { 
+      headers: {
         'Content-Type': 'application/json',
         'x-goog-api-key': GEMINI_KEY,
       },
@@ -87,9 +148,8 @@ export async function POST(request) {
     }
 
     const data = await res.json()
-    
+
     // Gemini 2.5 may have multiple parts (thinking + response)
-    // Find the text part that contains our JSON
     const parts = data.candidates?.[0]?.content?.parts || []
     let text = ''
     for (const part of parts) {
@@ -97,20 +157,16 @@ export async function POST(request) {
         text = part.text
       }
     }
-    // Fallback: just get any text
     if (!text) text = parts.find(p => p.text)?.text || ''
 
     // Parse JSON response from Gemini
     let parsed
     try {
-      // Clean up potential markdown wrapping and find JSON
       let clean = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim()
-      // Try to extract JSON object from the text
       const jsonMatch = clean.match(/\{[\s\S]*\}/)
       if (jsonMatch) clean = jsonMatch[0]
       parsed = JSON.parse(clean)
     } catch {
-      // If Gemini didn't return valid JSON, create a fallback
       parsed = {
         diagnostico: text,
         consejo: null,
