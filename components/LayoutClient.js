@@ -1,4 +1,5 @@
 'use client'
+import { Analytics } from '@vercel/analytics/react'
 import { AuthProvider, useAuth } from '@/contexts/AuthContext'
 import Header from './Header'
 import BottomNav from './BottomNav'
@@ -18,6 +19,7 @@ function LayoutInner({ children }) {
           onAuth={(u) => { setUser(u); setShowAuth(false) }}
         />
       )}
+      <Analytics />
     </>
   )
 }

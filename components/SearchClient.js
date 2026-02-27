@@ -1,6 +1,7 @@
 'use client'
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { useSearchParams } from 'next/navigation'
+import { track } from '@vercel/analytics'
 import RepairerCard from './RepairerCard'
 import { CatIcon } from './Icons'
 import { D } from '@/lib/theme'
@@ -13,6 +14,10 @@ export default function SearchClient({ repairers, categories, states }) {
   const [catF, setCatF] = useState(initialCat)
   const [stF, setStF] = useState('all')
   const [q, setQ] = useState('')
+
+  const trackSearch = useCallback((query) => {
+    if (query.length >= 3) track('search', { query: query.slice(0, 50) })
+  }, [])
 
   const cats = [{ id: 'all', name: 'Todas', full_name: 'Todas' }, ...(categories || [])]
   const sts = [{ id: 'all', name: 'Todo el País' }, ...(states || [])]
@@ -38,7 +43,7 @@ export default function SearchClient({ repairers, categories, states }) {
       {/* Search bar */}
       <input
         value={q}
-        onChange={e => setQ(e.target.value)}
+        onChange={e => { setQ(e.target.value); trackSearch(e.target.value) }}
         placeholder="Buscar por nombre, servicio, ciudad..."
         style={{
           width: '100%', padding: '14px 16px', borderRadius: 14,

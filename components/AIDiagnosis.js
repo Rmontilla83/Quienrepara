@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
+import { track } from '@vercel/analytics'
 import { getSupabaseClient } from '@/lib/supabase'
 import { localDiagnose } from '@/lib/utils'
 import { Y, YL, GL, PG, PL, D, R } from '@/lib/theme'
@@ -26,6 +27,7 @@ export default function AIDiagnosis() {
     setMsgs(p => [...p, { rl: 'user', tx: t }])
     setTyp(true)
     histRef.current.push({ role: 'user', text: t })
+    track('ai_diagnosis', { query: t.slice(0, 50) })
 
     try {
       const sb = getSupabaseClient()

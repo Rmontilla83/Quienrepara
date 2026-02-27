@@ -1,8 +1,20 @@
 {
-  "name": "Quién Repara",
+  "name": "QuiénRepara — Directorio de Reparadores",
   "short_name": "QuiénRepara",
+  "description": "Encuentra técnicos y reparadores verificados en Venezuela. Diagnóstico IA gratuito.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#fbbf24"
+  "theme_color": "#fbbf24",
+  "orientation": "portrait-primary",
+  "lang": "es",
+  "categories": ["business", "utilities"],
+  "icons": [
+    {
+      "src": "/logo-v3.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
 }

@@ -1,5 +1,6 @@
 'use client'
 import Link from 'next/link'
+import { track } from '@vercel/analytics'
 import StarRating from './StarRating'
 import { WhatsappIcon } from './Icons'
 import { initials, avatarColor, whatsappUrl, categoryColor } from '@/lib/utils'
@@ -32,7 +33,7 @@ export default function RepairerCard({ r, catName, stName }) {
           </div>
           {r.is_premium && r.whatsapp && (
             <a href={whatsappUrl(r.whatsapp, `Hola, encontré "${r.business_name}" en QuiénRepara.`)} target="_blank" rel="noreferrer"
-              onClick={(e) => e.stopPropagation()}
+              onClick={(e) => { e.stopPropagation(); track('whatsapp_click', { repairer: r.business_name, category: r.category_id }) }}
               style={{
                 width: 40, height: 40, borderRadius: '50%', background: WA,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',

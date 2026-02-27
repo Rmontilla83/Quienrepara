@@ -1,6 +1,7 @@
 'use client'
 import { useState } from 'react'
 import Link from 'next/link'
+import { track } from '@vercel/analytics'
 import { useAuth } from '@/contexts/AuthContext'
 import { getSupabaseClient } from '@/lib/supabase'
 import StarRating from './StarRating'
@@ -79,10 +80,10 @@ export default function RepairerProfile({ repairer: r, catName, stName, reviews:
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {r.phone ? (
               <>
-                <a href={whatsappUrl(r.whatsapp || r.phone, `Hola, encontré "${r.business_name}" en QuiénRepara. ¿Info sobre sus servicios?`)} target="_blank" rel="noreferrer" style={{ padding: 14, borderRadius: 12, background: WA, color: '#fff', fontSize: 16, fontWeight: 700, textDecoration: 'none', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                <a href={whatsappUrl(r.whatsapp || r.phone, `Hola, encontré "${r.business_name}" en QuiénRepara. ¿Info sobre sus servicios?`)} target="_blank" rel="noreferrer" onClick={() => track('whatsapp_contact', { repairer: r.business_name, category: catName })} style={{ padding: 14, borderRadius: 12, background: WA, color: '#fff', fontSize: 16, fontWeight: 700, textDecoration: 'none', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
                   <WhatsappIcon c="#fff" /> Contactar por WhatsApp
                 </a>
-                <a href={`tel:${cleanPhone(r.phone)}`} style={{ padding: 14, borderRadius: 12, border: `2px solid ${D}`, color: D, fontSize: 16, fontWeight: 700, textDecoration: 'none', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                <a href={`tel:${cleanPhone(r.phone)}`} onClick={() => track('phone_contact', { repairer: r.business_name })} style={{ padding: 14, borderRadius: 12, border: `2px solid ${D}`, color: D, fontSize: 16, fontWeight: 700, textDecoration: 'none', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
                   <PhoneIcon c={D} /> Llamar: {r.phone}
                 </a>
               </>
