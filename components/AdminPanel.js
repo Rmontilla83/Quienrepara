@@ -69,7 +69,7 @@ export default function AdminPanel() {
 
       {/* Tabs */}
       <div style={{ display: 'flex', gap: 4, marginBottom: 16, overflowX: 'auto' }}>
-        {[['overview','📊 Resumen'],['upload','📤 Carga Masiva'],['verify','✓ Verificaciones'],['manage','📋 Gestionar']].map(([id,label]) => (
+        {[['overview','📊 Resumen'],['upload','📤 Carga Masiva'],['verify','✓ Verificaciones'],['manage','📋 Gestionar'],['changelog','📋 Novedades']].map(([id,label]) => (
           <button key={id} onClick={() => setTab(id)} style={{ padding: '10px 16px', borderRadius: 10, border: tab === id ? 'none' : '1px solid #e5e7eb', background: tab === id ? D : '#fff', color: tab === id ? '#fff' : '#6b7280', fontSize: 13, fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' }}>{label}</button>
         ))}
       </div>
@@ -78,6 +78,7 @@ export default function AdminPanel() {
       {tab === 'upload' && <BulkUpload sb={sb} user={user} onDone={loadData} />}
       {tab === 'verify' && <VerifyQueue pending={pending} sb={sb} onDone={loadData} />}
       {tab === 'manage' && <ManageReps reps={reps} sb={sb} onDone={loadData} />}
+      {tab === 'changelog' && <Changelog />}
     </div>
   )
 }
@@ -481,3 +482,45 @@ function ManageReps({ reps, sb, onDone }) {
 const thS = { padding: '8px 10px', textAlign: 'left', fontSize: 11, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase' }
 const tdS = { padding: '8px 10px', verticalAlign: 'top' }
 const btnSmS = { padding: '4px 8px', borderRadius: 6, border: '1px solid #e5e7eb', background: '#fff', cursor: 'pointer', fontSize: 14 }
+
+// ============================================================
+// CHANGELOG
+// ============================================================
+const CHANGELOG = [
+  { date: '2025-02-27', type: 'nuevo', title: 'Panel de Novedades', description: 'Nueva pestaña en el panel de admin para ver el historial de cambios de la plataforma.' },
+  { date: '2025-02-26', type: 'nuevo', title: 'Analytics y Tracking de Eventos', description: 'Se integró tracking de eventos clave: búsquedas, clics en contacto (teléfono, WhatsApp, email), vistas de perfil y compartidos. Dashboard de métricas en el admin.' },
+  { date: '2025-02-26', type: 'mejora', title: 'PWA Manifest Mejorado', description: 'Manifest actualizado con iconos, colores de tema y configuración para instalación como app nativa.' },
+  { date: '2025-02-25', type: 'mejora', title: 'Reestructuración SPA a Rutas Reales', description: 'Se migró de una Single Page App a rutas reales de Next.js para mejor navegación, SEO y compartibilidad de URLs.' },
+  { date: '2025-02-25', type: 'mejora', title: 'SEO y Meta Tags', description: 'Implementación de meta tags dinámicos, Open Graph, sitemap.xml y robots.txt para mejor posicionamiento en buscadores.' },
+  { date: '2025-02-25', type: 'mejora', title: 'Componentes Compartidos', description: 'Extracción de componentes reutilizables (Header, Footer, cards) para consistencia visual y mantenimiento más fácil.' },
+  { date: '2025-02-24', type: 'fix', title: 'Corrección de Vulnerabilidad XSS', description: 'Se sanitizaron todas las entradas de usuario para prevenir ataques de Cross-Site Scripting en campos de texto y búsqueda.' },
+  { date: '2025-02-24', type: 'fix', title: 'Autenticación de API Asegurada', description: 'Se agregaron validaciones de autenticación y autorización en todos los endpoints de la API. Row Level Security habilitado en Supabase.' },
+  { date: '2025-02-24', type: 'mejora', title: 'Headers de Seguridad', description: 'Configuración de headers HTTP de seguridad: CSP, X-Frame-Options, HSTS y otros para proteger contra ataques comunes.' },
+  { date: '2025-02-24', type: 'nuevo', title: 'Error Boundaries', description: 'Se agregaron Error Boundaries en React para capturar errores de renderizado y mostrar mensajes amigables en vez de pantallas rotas.' },
+  { date: '2025-02-24', type: 'fix', title: 'Eliminación de Reviews Falsos', description: 'Se removieron reviews hardcodeados y se implementó sistema de reseñas reales vinculadas a usuarios autenticados.' },
+]
+
+const CL_COLORS = { fix: { bg: '#fef2f2', color: '#dc2626', label: 'Fix' }, mejora: { bg: '#eff6ff', color: '#2563eb', label: 'Mejora' }, nuevo: { bg: '#f0fdf4', color: '#16a34a', label: 'Nuevo' } }
+
+function Changelog() {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <p style={{ color: '#94a3b8', fontSize: 13 }}>Historial de cambios y mejoras de la plataforma</p>
+      {CHANGELOG.map((entry, i) => {
+        const c = CL_COLORS[entry.type] || CL_COLORS.mejora
+        return (
+          <div key={i} style={{ background: '#fff', borderRadius: 14, border: '1px solid #e5e7eb', padding: 16 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 6, background: c.bg, color: c.color, fontWeight: 700 }}>{c.label}</span>
+                <h4 style={{ margin: 0, fontSize: 15, fontWeight: 700 }}>{entry.title}</h4>
+              </div>
+              <span style={{ fontSize: 12, color: '#94a3b8', whiteSpace: 'nowrap' }}>{entry.date}</span>
+            </div>
+            <p style={{ margin: 0, fontSize: 13, color: '#6b7280', lineHeight: 1.5 }}>{entry.description}</p>
+          </div>
+        )
+      })}
+    </div>
+  )
+}
