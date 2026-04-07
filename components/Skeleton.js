@@ -1,19 +1,19 @@
 export function CardSkeleton() {
   return (
     <div style={{
-      background: '#fff', borderRadius: 14, border: '1px solid #e5e7eb',
-      padding: 16, animation: 'pulse 1.5s infinite ease-in-out'
+      background: '#fff', borderRadius: 16, border: '1px solid #f1f5f9',
+      padding: 16, boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
     }}>
       <div style={{ display: 'flex', gap: 12, marginBottom: 12 }}>
-        <div style={{ width: 48, height: 48, borderRadius: 12, background: '#e2e8f0' }} />
+        <div className="skeleton" style={{ width: 52, height: 52, borderRadius: 14 }} />
         <div style={{ flex: 1 }}>
-          <div style={{ height: 16, background: '#e2e8f0', borderRadius: 4, width: '60%', marginBottom: 8 }} />
-          <div style={{ height: 12, background: '#e2e8f0', borderRadius: 4, width: '40%' }} />
+          <div className="skeleton" style={{ height: 14, width: '50%', marginBottom: 8, borderRadius: 6 }} />
+          <div className="skeleton" style={{ height: 12, width: '70%', marginBottom: 6, borderRadius: 6 }} />
+          <div className="skeleton" style={{ height: 12, width: '30%', borderRadius: 6 }} />
         </div>
       </div>
-      <div style={{ height: 12, background: '#e2e8f0', borderRadius: 4, width: '80%', marginBottom: 8 }} />
-      <div style={{ height: 12, background: '#e2e8f0', borderRadius: 4, width: '50%' }} />
-      <style jsx>{`@keyframes pulse { 0%,100% { opacity: 1 } 50% { opacity: 0.5 } }`}</style>
+      <div className="skeleton" style={{ height: 12, width: '90%', marginBottom: 6, borderRadius: 6 }} />
+      <div className="skeleton" style={{ height: 12, width: '60%', borderRadius: 6 }} />
     </div>
   )
 }
