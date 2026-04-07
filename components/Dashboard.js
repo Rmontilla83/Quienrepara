@@ -90,7 +90,7 @@ export default function Dashboard() {
               color: isRepairer ? '#92400e' : '#0c4a6e',
               fontWeight: 700, border: `1px solid ${isRepairer ? '#fde68a' : '#bae6fd'}`,
             }}>
-              {isRepairer ? '🔧 Reparador' : '🔍 Cliente'}
+              {isRepairer ? 'Reparador' : 'Cliente'}
             </span>
           </div>
         </div>
@@ -133,7 +133,12 @@ export default function Dashboard() {
               <div style={{ fontSize: 11, color: '#6d28d9', fontWeight: 500 }}>Opiniones</div>
             </div>
             <div style={{ background: rep.is_active ? '#f0fdf4' : '#fef2f2', borderRadius: 14, padding: '14px 12px', textAlign: 'center', border: `1px solid ${rep.is_active ? '#bbf7d0' : '#fecaca'}` }}>
-              <div style={{ fontSize: 24, fontWeight: 800, color: rep.is_active ? G : R }}>{rep.is_active ? '✓' : '✗'}</div>
+              <div style={{ fontSize: 24, fontWeight: 800, color: rep.is_active ? G : R }}>
+                {rep.is_active
+                  ? <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={G} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                  : <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={R} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                }
+              </div>
               <div style={{ fontSize: 11, color: rep.is_active ? '#166534' : '#dc2626', fontWeight: 500 }}>Activo</div>
             </div>
           </div>
@@ -209,7 +214,9 @@ export default function Dashboard() {
               borderRadius: 18, padding: 22, marginTop: 20, textAlign: 'center',
               border: '1px solid rgba(251,191,36,0.15)',
             }}>
-              <div style={{ fontSize: 28, marginBottom: 8 }}>⚡</div>
+              <div style={{ width: 44, height: 44, borderRadius: 14, background: 'rgba(251,191,36,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 8px' }}>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+              </div>
               <h4 style={{ color: '#fff', fontSize: 18, fontWeight: 800, marginBottom: 4, letterSpacing: '-0.3px' }}>Hazte Premium</h4>
               <p style={{ color: '#94a3b8', fontSize: 13, marginBottom: 14, lineHeight: 1.5 }}>WhatsApp directo, badge destacado y más visibilidad en búsquedas</p>
               <button className="btn-press" style={{
@@ -232,8 +239,10 @@ export default function Dashboard() {
           <div style={{
             width: 64, height: 64, borderRadius: 20, background: '#f0f9ff',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            margin: '0 auto 14px', fontSize: 28,
-          }}>🔍</div>
+            margin: '0 auto 14px',
+          }}>
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#0c4a6e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          </div>
           <h3 style={{ fontSize: 20, fontWeight: 800, marginBottom: 6, letterSpacing: '-0.3px' }}>Cuenta de Cliente</h3>
           <p style={{ color: '#94a3b8', fontSize: 14, marginBottom: 20, lineHeight: 1.5 }}>
             Usa el diagnóstico IA para encontrar al técnico ideal, o busca directamente por categoría.

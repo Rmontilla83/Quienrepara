@@ -49,7 +49,7 @@ export default function AdminPanel() {
 
       <div style={{ background: '#fff', borderRadius: 18, border: '1px solid #e5e7eb', padding: 24, marginBottom: 16 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
-          <div style={{ width: 48, height: 48, borderRadius: 14, background: '#fef2f2', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24 }}>🛡️</div>
+          <div style={{ width: 48, height: 48, borderRadius: 14, background: '#fef2f2', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24 }}><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#dc2626" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
           <div>
             <h1 style={{ margin: 0, fontSize: 22, fontWeight: 700 }}>Panel de Administración</h1>
             <p style={{ margin: 0, color: '#94a3b8', fontSize: 13 }}>Gestión de reparadores y verificaciones</p>
@@ -69,7 +69,7 @@ export default function AdminPanel() {
 
       {/* Tabs */}
       <div style={{ display: 'flex', gap: 4, marginBottom: 16, overflowX: 'auto' }}>
-        {[['overview','📊 Resumen'],['upload','📤 Carga Masiva'],['verify','✓ Verificaciones'],['manage','📋 Gestionar'],['changelog','📋 Novedades']].map(([id,label]) => (
+        {[['overview','Resumen'],['upload','Carga Masiva'],['verify','Verificaciones'],['manage','Gestionar'],['changelog','Novedades']].map(([id,label]) => (
           <button key={id} onClick={() => setTab(id)} style={{ padding: '10px 16px', borderRadius: 10, border: tab === id ? 'none' : '1px solid #e5e7eb', background: tab === id ? D : '#fff', color: tab === id ? '#fff' : '#6b7280', fontSize: 13, fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' }}>{label}</button>
         ))}
       </div>
@@ -250,7 +250,7 @@ function BulkUpload({ sb, user, onDone }) {
 
     setResult({
       type: errors.length && !created && !updated ? 'error' : errors.length ? 'partial' : 'ok',
-      text: `✅ ${created} nuevos, 🔄 ${updated} actualizados, ⏭️ ${preview.length - created - updated - errors.length} sin cambios${errors.length ? `. ⚠️ ${errors.length} errores.` : '.'}`
+      text: `${created} nuevos, ${updated} actualizados, ${preview.length - created - updated - errors.length} sin cambios${errors.length ? `. ${errors.length} errores.` : '.'}`
     })
     setUploading(false)
     setPreview(null)
@@ -269,7 +269,7 @@ function BulkUpload({ sb, user, onDone }) {
 
   return (
     <div style={{ background: '#fff', borderRadius: 14, border: '1px solid #e5e7eb', padding: 24 }}>
-      <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 4 }}>📤 Carga Masiva de Reparadores</h3>
+      <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 4 }}>Carga Masiva de Reparadores</h3>
       <p style={{ color: '#94a3b8', fontSize: 13, marginBottom: 16 }}>Sube un archivo CSV/JSON o pega los datos directamente</p>
 
       {/* Format guide */}
@@ -297,7 +297,7 @@ function BulkUpload({ sb, user, onDone }) {
       {/* File upload */}
       <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
         <input ref={fileRef} type="file" accept=".json,.csv,.txt" onChange={handleFile} style={{ display: 'none' }} />
-        <button onClick={() => fileRef.current?.click()} style={{ padding: '10px 20px', borderRadius: 10, border: '1.5px dashed #e5e7eb', background: '#fff', color: '#6b7280', fontSize: 13, fontWeight: 600, cursor: 'pointer', flex: 1 }}>📁 Seleccionar archivo CSV/JSON</button>
+        <button onClick={() => fileRef.current?.click()} style={{ padding: '10px 20px', borderRadius: 10, border: '1.5px dashed #e5e7eb', background: '#fff', color: '#6b7280', fontSize: 13, fontWeight: 600, cursor: 'pointer', flex: 1 }}>Seleccionar archivo CSV/JSON</button>
       </div>
 
       {/* Text area */}
@@ -312,11 +312,11 @@ function BulkUpload({ sb, user, onDone }) {
       {result && <div style={{ padding: '16px 20px', borderRadius: 12, marginBottom: 16, background: result.type === 'ok' ? '#f0fdf4' : result.type === 'error' ? '#fef2f2' : '#fffbeb', color: result.type === 'ok' ? '#166534' : result.type === 'error' ? R : '#92400e', fontSize: 15, fontWeight: 600, border: `2px solid ${result.type === 'ok' ? '#bbf7d0' : result.type === 'error' ? '#fecaca' : '#fde68a'}`, textAlign: 'center' }}>{result.text}</div>}
 
       {!preview ? (
-        <button onClick={handlePreview} disabled={!text.trim()} style={{ padding: '12px 24px', borderRadius: 10, border: 'none', background: text.trim() ? D : '#e5e7eb', color: text.trim() ? '#fff' : '#94a3b8', fontSize: 14, fontWeight: 700, cursor: text.trim() ? 'pointer' : 'default' }}>👁️ Vista Previa</button>
+        <button onClick={handlePreview} disabled={!text.trim()} style={{ padding: '12px 24px', borderRadius: 10, border: 'none', background: text.trim() ? D : '#e5e7eb', color: text.trim() ? '#fff' : '#94a3b8', fontSize: 14, fontWeight: 700, cursor: text.trim() ? 'pointer' : 'default' }}>Vista Previa</button>
       ) : (
         <div>
           <div style={{ background: '#f0fdf4', borderRadius: 10, padding: 12, marginBottom: 12, fontSize: 13, color: '#166534', border: '1px solid #bbf7d0' }}>
-            ✅ {preview.length} reparadores listos para importar
+            {preview.length} reparadores listos para importar
           </div>
           <div style={{ maxHeight: 300, overflowY: 'auto', marginBottom: 12 }}>
             <table style={{ width: '100%', fontSize: 12, borderCollapse: 'collapse' }}>
@@ -343,7 +343,7 @@ function BulkUpload({ sb, user, onDone }) {
           <div style={{ display: 'flex', gap: 8 }}>
             <button onClick={() => { setPreview(null); setResult(null) }} style={{ padding: '12px 24px', borderRadius: 10, border: '1px solid #e5e7eb', background: '#fff', color: '#6b7280', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>Cancelar</button>
             <button onClick={handleUpload} disabled={uploading} style={{ flex: 1, padding: '12px 24px', borderRadius: 10, border: 'none', background: uploading ? '#e5e7eb' : G, color: uploading ? '#6b7280' : '#fff', fontSize: 14, fontWeight: 700, cursor: uploading ? 'default' : 'pointer' }}>
-              {uploading ? `Importando... ${progress}%` : `✅ Importar ${preview.length} reparadores`}
+              {uploading ? `Importando... ${progress}%` : `Importar ${preview.length} reparadores`}
             </button>
           </div>
           {uploading && <div style={{ marginTop: 8, background: '#e5e7eb', borderRadius: 8, height: 8, overflow: 'hidden' }}>
@@ -374,7 +374,9 @@ function VerifyQueue({ pending, sb, onDone }) {
 
   if (!pending.length) return (
     <div style={{ background: '#fff', borderRadius: 14, border: '1px solid #e5e7eb', padding: 40, textAlign: 'center' }}>
-      <div style={{ fontSize: 48, marginBottom: 12 }}>✅</div>
+      <div style={{ width: 56, height: 56, borderRadius: 16, background: '#f0fdf4', border: '1px solid #bbf7d0', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px' }}>
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+      </div>
       <h3 style={{ fontSize: 18, fontWeight: 700 }}>No hay verificaciones pendientes</h3>
       <p style={{ color: '#94a3b8', fontSize: 14 }}>Todos los reparadores han sido revisados</p>
     </div>
@@ -388,18 +390,18 @@ function VerifyQueue({ pending, sb, onDone }) {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
             <div>
               <h4 style={{ margin: '0 0 4px', fontSize: 15, fontWeight: 700 }}>{r.business_name}</h4>
-              <p style={{ margin: 0, fontSize: 13, color: '#6b7280' }}>👤 {r.contact_name} · 📍 {r.city}</p>
-              <p style={{ margin: '4px 0 0', fontSize: 13, color: '#6b7280' }}>📞 {r.phone} {r.email ? `· ✉️ ${r.email}` : ''}</p>
-              {r.instagram && <p style={{ margin: '2px 0 0', fontSize: 13, color: '#6b7280' }}>📸 {r.instagram}</p>}
+              <p style={{ margin: 0, fontSize: 13, color: '#6b7280' }}>{r.contact_name} · {r.city}</p>
+              <p style={{ margin: '4px 0 0', fontSize: 13, color: '#6b7280' }}>{r.phone} {r.email ? `· ${r.email}` : ''}</p>
+              {r.instagram && <p style={{ margin: '2px 0 0', fontSize: 13, color: '#6b7280' }}>{r.instagram}</p>}
             </div>
             <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 4, background: r.verification_status === 'review' ? '#fffbeb' : '#f8fafc', color: r.verification_status === 'review' ? '#92400e' : '#6b7280', fontWeight: 700 }}>
-              {r.verification_status === 'review' ? '🔍 REVISAR' : '⏳ PENDIENTE'}
+              {r.verification_status === 'review' ? 'REVISAR' : 'PENDIENTE'}
             </span>
           </div>
           <p style={{ fontSize: 13, color: '#6b7280', marginBottom: 12 }}>{r.description}</p>
           <div style={{ display: 'flex', gap: 8 }}>
-            <button onClick={() => verify(r.id, 'verified')} disabled={acting === r.id} style={{ flex: 1, padding: '10px', borderRadius: 8, border: 'none', background: G, color: '#fff', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>✓ Verificar</button>
-            <button onClick={() => verify(r.id, 'rejected')} disabled={acting === r.id} style={{ padding: '10px 16px', borderRadius: 8, border: '1px solid #fecaca', background: '#fff', color: R, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>✗ Rechazar</button>
+            <button onClick={() => verify(r.id, 'verified')} disabled={acting === r.id} style={{ flex: 1, padding: '10px', borderRadius: 8, border: 'none', background: G, color: '#fff', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>Verificar</button>
+            <button onClick={() => verify(r.id, 'rejected')} disabled={acting === r.id} style={{ padding: '10px 16px', borderRadius: 8, border: '1px solid #fecaca', background: '#fff', color: R, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>Rechazar</button>
           </div>
         </div>
       ))}
@@ -464,10 +466,10 @@ function ManageReps({ reps, sb, onDone }) {
                 </td>
                 <td style={tdS}>
                   <div style={{ display: 'flex', gap: 4 }}>
-                    <button onClick={() => toggle(r.id, 'is_premium', !r.is_premium)} disabled={acting === r.id} style={btnSmS} title={r.is_premium ? 'Quitar Premium' : 'Hacer Premium'}>{r.is_premium ? '⭐' : '☆'}</button>
-                    <button onClick={() => toggle(r.id, 'is_active', !r.is_active)} disabled={acting === r.id} style={btnSmS} title={r.is_active ? 'Desactivar' : 'Activar'}>{r.is_active ? '🟢' : '🔴'}</button>
-                    <button onClick={() => toggle(r.id, 'is_verified', !r.is_verified)} disabled={acting === r.id} style={btnSmS} title={r.is_verified ? 'Quitar Verificación' : 'Verificar'}>{r.is_verified ? '✓' : '○'}</button>
-                    <button onClick={() => deleteRep(r.id)} disabled={acting === r.id} style={{ ...btnSmS, color: R }} title="Eliminar">🗑️</button>
+                    <button onClick={() => toggle(r.id, 'is_premium', !r.is_premium)} disabled={acting === r.id} style={{ ...btnSmS, background: r.is_premium ? '#fffbeb' : '#fff' }} title={r.is_premium ? 'Quitar Premium' : 'Hacer Premium'}><svg width="14" height="14" viewBox="0 0 24 24" fill={r.is_premium ? '#f59e0b' : 'none'} stroke="#f59e0b" strokeWidth="2"><path d="M12 2l2.39 4.84 5.34.78-3.87 3.77.91 5.32L12 13.27l-4.77 2.51.91-5.32L4.27 6.69l5.34-.78L12 2z"/></svg></button>
+                    <button onClick={() => toggle(r.id, 'is_active', !r.is_active)} disabled={acting === r.id} style={btnSmS} title={r.is_active ? 'Desactivar' : 'Activar'}><span style={{ width: 10, height: 10, borderRadius: '50%', background: r.is_active ? '#22c55e' : '#ef4444', display: 'inline-block' }} /></button>
+                    <button onClick={() => toggle(r.id, 'is_verified', !r.is_verified)} disabled={acting === r.id} style={btnSmS} title={r.is_verified ? 'Quitar Verificación' : 'Verificar'}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={r.is_verified ? '#22c55e' : '#cbd5e1'} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg></button>
+                    <button onClick={() => deleteRep(r.id)} disabled={acting === r.id} style={{ ...btnSmS, color: R }} title="Eliminar"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></button>
                   </div>
                 </td>
               </tr>

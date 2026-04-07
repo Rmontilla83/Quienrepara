@@ -11,8 +11,10 @@ export default function NotFound() {
         width: 80, height: 80, borderRadius: 24,
         background: '#fffbeb', border: '2px solid #fde68a',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        marginBottom: 20, fontSize: 36,
-      }}>🔍</div>
+        marginBottom: 20,
+      }}>
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#92400e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      </div>
       <h1 style={{ fontSize: 56, margin: '0 0 4px', color: '#fbbf24', fontWeight: 900, letterSpacing: '-2px' }}>404</h1>
       <h2 style={{ fontSize: 22, marginBottom: 8, color: '#0f172a', fontWeight: 800 }}>
         Página no encontrada

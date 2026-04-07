@@ -29,27 +29,27 @@ export default function HomeClient({ repairers, categories, ad }) {
       )}
 
       {/* === HERO === */}
-      <div className="hero-mesh" style={{ padding: '48px 16px 40px', minHeight: 520 }}>
-        {/* Floating orbs */}
+      <div className="hero-warm" style={{ padding: '48px 16px 40px', minHeight: 500 }}>
+        {/* Floating geometric shapes */}
         <div style={{
-          position: 'absolute', top: '15%', left: '8%',
-          width: 8, height: 8, borderRadius: '50%', background: Y, opacity: 0.6,
-          animation: 'orbFloat 6s ease-in-out infinite',
+          position: 'absolute', top: '12%', left: '6%',
+          width: 40, height: 40, borderRadius: 10, border: '2px solid rgba(255,255,255,0.08)',
+          animation: 'orbFloat 8s ease-in-out infinite', transform: 'rotate(15deg)',
         }} />
         <div style={{
-          position: 'absolute', top: '25%', right: '12%',
-          width: 5, height: 5, borderRadius: '50%', background: '#8b5cf6', opacity: 0.5,
-          animation: 'orbFloat 8s ease-in-out infinite 1s',
+          position: 'absolute', top: '20%', right: '10%',
+          width: 24, height: 24, borderRadius: '50%', border: '2px solid rgba(255,255,255,0.06)',
+          animation: 'orbFloat 10s ease-in-out infinite 1s',
         }} />
         <div style={{
-          position: 'absolute', bottom: '30%', left: '15%',
-          width: 6, height: 6, borderRadius: '50%', background: '#06b6d4', opacity: 0.4,
-          animation: 'orbFloat 7s ease-in-out infinite 2s',
+          position: 'absolute', bottom: '25%', left: '12%',
+          width: 16, height: 16, borderRadius: 4, background: 'rgba(255,255,255,0.04)',
+          animation: 'orbFloat 7s ease-in-out infinite 2s', transform: 'rotate(45deg)',
         }} />
         <div style={{
-          position: 'absolute', top: '60%', right: '20%',
-          width: 4, height: 4, borderRadius: '50%', background: Y, opacity: 0.3,
-          animation: 'orbFloat 9s ease-in-out infinite 0.5s',
+          position: 'absolute', top: '55%', right: '8%',
+          width: 32, height: 32, borderRadius: 8, border: '1.5px solid rgba(255,255,255,0.05)',
+          animation: 'orbFloat 9s ease-in-out infinite 0.5s', transform: 'rotate(-10deg)',
         }} />
 
         <div style={{ maxWidth: 600, margin: '0 auto', position: 'relative', zIndex: 2 }}>
@@ -57,9 +57,9 @@ export default function HomeClient({ repairers, categories, ad }) {
           <div className="fade-up" style={{ textAlign: 'center', marginBottom: 28 }}>
             <div style={{
               display: 'inline-flex', alignItems: 'center', gap: 8,
-              background: 'rgba(255,255,255,0.08)', backdropFilter: 'blur(12px)',
+              background: 'rgba(255,255,255,0.1)', backdropFilter: 'blur(12px)',
               WebkitBackdropFilter: 'blur(12px)',
-              border: '1px solid rgba(255,255,255,0.1)',
+              border: '1px solid rgba(255,255,255,0.12)',
               padding: '8px 18px', borderRadius: 50,
             }}>
               <span style={{
@@ -87,13 +87,7 @@ export default function HomeClient({ repairers, categories, ad }) {
             }}>
               Se dañó algo.
               <br />
-              <span style={{
-                background: 'linear-gradient(135deg, #fbbf24, #f59e0b, #fbbf24)',
-                backgroundSize: '200% auto',
-                animation: 'gradientShift 3s ease infinite',
-                WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text',
-              }}>Nosotros lo resolvemos.</span>
+              <span style={{ color: D }}>Nosotros lo resolvemos.</span>
             </h1>
             <p style={{
               color: 'rgba(255,255,255,0.55)', fontSize: 16, lineHeight: 1.6,
@@ -110,16 +104,15 @@ export default function HomeClient({ repairers, categories, ad }) {
           }}>
             <Link href="/diagnostico" className="btn-press" style={{
               padding: '18px 24px', borderRadius: 16, border: 'none',
-              background: 'linear-gradient(135deg, #8b5cf6, #7c3aed)',
-              color: '#fff', fontSize: 16, fontWeight: 700,
+              background: D, color: '#fff', fontSize: 16, fontWeight: 700,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               gap: 10, textDecoration: 'none',
-              boxShadow: '0 8px 30px rgba(139,92,246,0.4), 0 0 0 1px rgba(139,92,246,0.2)',
+              boxShadow: '0 8px 30px rgba(0,0,0,0.3), 0 0 0 1px rgba(0,0,0,0.1)',
               position: 'relative', overflow: 'hidden',
             }}>
               <span style={{
                 position: 'absolute', inset: 0,
-                background: 'linear-gradient(135deg, transparent 30%, rgba(255,255,255,0.1) 50%, transparent 70%)',
+                background: 'linear-gradient(135deg, transparent 30%, rgba(255,255,255,0.06) 50%, transparent 70%)',
                 backgroundSize: '200% 100%',
                 animation: 'shimmer 2.5s infinite',
               }} />
@@ -127,8 +120,8 @@ export default function HomeClient({ repairers, categories, ad }) {
             </Link>
             <Link href="/buscar" className="btn-press" style={{
               padding: '16px 24px', borderRadius: 16,
-              border: '1.5px solid rgba(255,255,255,0.15)',
-              background: 'rgba(255,255,255,0.05)',
+              border: '1.5px solid rgba(255,255,255,0.2)',
+              background: 'rgba(255,255,255,0.08)',
               backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)',
               color: '#fff', fontSize: 15, fontWeight: 600,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -146,7 +139,7 @@ export default function HomeClient({ repairers, categories, ad }) {
               gridTemplateColumns: (categories || []).length > 4 ? 'repeat(3,1fr)' : `repeat(${(categories || []).length},1fr)`,
               gap: 8,
             }}>
-              {(categories || []).map((cat, i) => {
+              {(categories || []).map((cat) => {
                 const cc = CAT_COLORS_FULL[cat.id] || '#6b7280'
                 return (
                   <Link key={cat.id} href={`/buscar?cat=${cat.id}`} className="cat-glass" style={{
@@ -176,53 +169,47 @@ export default function HomeClient({ repairers, categories, ad }) {
         </div>
       </div>
 
-      {/* === POST-HERO CONTENT === */}
+      {/* === POST-HERO === */}
       <div style={{ maxWidth: 600, margin: '0 auto', padding: '0 16px' }}>
 
-        {/* How it works — with gradient border card */}
+        {/* How it works */}
         <div style={{ margin: '-20px 0 20px', position: 'relative', zIndex: 10 }}>
-          <div className="gradient-border fade-up">
-            <div style={{
-              background: '#0f172a', borderRadius: 20, padding: '22px 18px',
-            }}>
+          <div className="fade-up" style={{
+            background: '#fff', borderRadius: 20, padding: '22px 18px',
+            boxShadow: '0 4px 20px rgba(0,0,0,0.08)', border: '1px solid #f1f5f9',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
               <div style={{
-                display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16,
+                width: 28, height: 28, borderRadius: 8,
+                background: 'linear-gradient(135deg, #fef3c7, #fde68a)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}>
-                <div style={{
-                  width: 28, height: 28, borderRadius: 8,
-                  background: 'linear-gradient(135deg, rgba(251,191,36,0.2), rgba(139,92,246,0.2))',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#92400e" strokeWidth="2.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" strokeLinecap="round" strokeLinejoin="round" /></svg>
+              </div>
+              <span style={{
+                fontSize: 12, fontWeight: 700, color: '#94a3b8',
+                letterSpacing: '1px', textTransform: 'uppercase',
+              }}>Cómo funciona</span>
+            </div>
+            <div style={{ display: 'flex', gap: 8 }}>
+              {[
+                { num: '01', title: 'Describe', sub: 'Cuéntanos qué se dañó', color: '#8b5cf6', icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg> },
+                { num: '02', title: 'IA Analiza', sub: 'Diagnóstico al instante', color: '#f59e0b', icon: <SparkleIcon sz={18} c="#f59e0b" fill="none" /> },
+                { num: '03', title: 'Conecta', sub: 'Contacta al técnico', color: '#22c55e', icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> },
+              ].map((step, i) => (
+                <div key={i} style={{
+                  flex: 1, textAlign: 'center', padding: '14px 6px',
+                  background: '#f8fafc', borderRadius: 14,
                 }}>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" strokeWidth="2.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                  <div style={{
+                    width: 40, height: 40, borderRadius: 12,
+                    background: `${step.color}10`, margin: '0 auto 8px',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}>{step.icon}</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: D, marginBottom: 2 }}>{step.title}</div>
+                  <div style={{ fontSize: 10, color: '#94a3b8', lineHeight: 1.3 }}>{step.sub}</div>
                 </div>
-                <span style={{
-                  fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.5)',
-                  letterSpacing: '1px', textTransform: 'uppercase',
-                }}>Cómo funciona</span>
-              </div>
-              <div style={{ display: 'flex', gap: 6 }}>
-                {[
-                  { icon: '💬', num: '01', title: 'Describe', sub: 'Cuéntanos qué se dañó', color: '#8b5cf6' },
-                  { icon: '⚡', num: '02', title: 'IA Analiza', sub: 'Diagnóstico al instante', color: '#fbbf24' },
-                  { icon: '✓', num: '03', title: 'Conecta', sub: 'Contacta al técnico', color: '#22c55e' },
-                ].map((step, i) => (
-                  <div key={i} className="fade-up" style={{
-                    flex: 1, textAlign: 'center', padding: '12px 6px',
-                    background: 'rgba(255,255,255,0.03)', borderRadius: 12,
-                    border: '1px solid rgba(255,255,255,0.05)',
-                    animationDelay: `${0.4 + i * 0.1}s`,
-                  }}>
-                    <div style={{
-                      width: 36, height: 36, borderRadius: 10,
-                      background: `${step.color}15`, margin: '0 auto 8px',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontSize: 18,
-                    }}>{step.icon}</div>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: '#fff', marginBottom: 2 }}>{step.title}</div>
-                    <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', lineHeight: 1.3 }}>{step.sub}</div>
-                  </div>
-                ))}
-              </div>
+              ))}
             </div>
           </div>
         </div>
@@ -231,12 +218,8 @@ export default function HomeClient({ repairers, categories, ad }) {
         {premium.length > 0 && (
           <>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, marginTop: 8 }}>
-              <h2 style={{ fontSize: 20, fontWeight: 800, letterSpacing: '-0.3px' }}>
-                Destacados
-              </h2>
-              <Link href="/buscar" style={{ fontSize: 13, fontWeight: 600, color: PL, textDecoration: 'none' }}>
-                Ver todos →
-              </Link>
+              <h2 style={{ fontSize: 20, fontWeight: 800, letterSpacing: '-0.3px' }}>Destacados</h2>
+              <Link href="/buscar" style={{ fontSize: 13, fontWeight: 600, color: PL, textDecoration: 'none' }}>Ver todos →</Link>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 20 }}>
               {premium.slice(0, 5).map((r, i) => (
@@ -253,8 +236,7 @@ export default function HomeClient({ repairers, categories, ad }) {
           display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
           padding: '16px', borderRadius: 16,
           border: '2px solid #e2e8f0', background: '#fff',
-          textDecoration: 'none', color: D, fontWeight: 700, fontSize: 15,
-          marginBottom: 16,
+          textDecoration: 'none', color: D, fontWeight: 700, fontSize: 15, marginBottom: 16,
         }}>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" />
@@ -293,11 +275,7 @@ export default function HomeClient({ repairers, categories, ad }) {
           </div>
         </Link>
 
-        {/* Disclaimer */}
-        <p style={{
-          textAlign: 'center', color: '#cbd5e1', fontSize: 11,
-          padding: '0 16px 12px', lineHeight: 1.5
-        }}>
+        <p style={{ textAlign: 'center', color: '#cbd5e1', fontSize: 11, padding: '0 16px 12px', lineHeight: 1.5 }}>
           El diagnóstico IA es orientativo y no reemplaza la evaluación de un profesional.
         </p>
       </div>
